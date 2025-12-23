@@ -3,14 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>繁體農民曆</title>
+    <title>繁體農民曆 - 快速查詢版</title>
     
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="農民曆">
     
-    <link rel="apple-touch-icon" href="icon.png">
-
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/lunar-javascript/lunar.js"></script>
     
@@ -26,7 +24,6 @@
             font-family: 'Noto Sans TC', sans-serif; 
             background-color: #fcfcfb; 
             color: #1a1a1a;
-            /* 防止內容被 iPhone 瀏海遮住 */
             padding-top: var(--iphone-safe-top);
             padding-bottom: var(--iphone-safe-bottom);
             -webkit-tap-highlight-color: transparent;
@@ -45,31 +42,30 @@
             overflow: hidden;
         }
         
-        /* iPhone 點擊回饋效果 */
         .day-box:active {
             transform: scale(0.95);
             background-color: #f3f4f6;
         }
 
-        .active-day { 
-            border: 2px solid #1a1a1a !important; 
-            z-index: 20;
-        }
-        
-        .dot-festival { width: 4px; height: 4px; background-color: currentColor; border-radius: 50%; display: inline-block; }
+        .active-day { border: 2.5px solid #1a1a1a !important; z-index: 20; }
         
         .festival-tag {
             background-color: #a62c2b; color: white; padding: 2px 8px; font-size: 0.7rem;
             letter-spacing: 0.1em; display: inline-block; margin-bottom: 0.5rem;
         }
 
-        #copyTip { transition: opacity 0.3s; opacity: 0; pointer-events: none; }
-
-        /* 針對行動裝置微調字體 */
-        @media (max-width: 640px) {
-            h1 { font-size: 1.5rem !important; }
-            .day-box .text-4xl { font-size: 1.8rem; }
+        /* 隱藏原生下拉選單箭頭，改用更簡潔的樣式 */
+        select {
+            appearance: none;
+            background: transparent;
+            border: none;
+            padding: 0 4px;
+            font-weight: bold;
+            color: #1a1a1a;
+            text-align: center;
         }
+
+        #copyTip { transition: opacity 0.3s; opacity: 0; pointer-events: none; }
     </style>
 </head>
 <body class="p-4">
@@ -78,13 +74,25 @@
     <header class="flex flex-col space-y-4 border-b border-black pb-4 mb-6">
         <div class="flex justify-between items-center">
             <h1 class="text-2xl font-light tracking-[0.1em] serif">農民曆</h1>
-            <button onclick="goToday()" class="bg-black text-white px-4 py-1.5 rounded-full text-xs">今日</button>
+            <button onclick="goToday()" class="bg-black text-white px-5 py-1.5 rounded-full text-xs font-bold active:opacity-70">今日</button>
         </div>
         
-        <div class="flex items-center justify-between text-sm bg-gray-100 p-2 rounded-lg">
-            <button onclick="changeMonth(-1)" class="px-4 py-2 font-bold">上個月</button>
-            <div id="monthTitle" class="text-lg font-bold"></div>
-            <button onclick="changeMonth(1)" class="px-4 py-2 font-bold">下個月</button>
+        <div class="flex items-center justify-between bg-gray-100 rounded-xl p-1">
+            <button onclick="changeMonth(-1)" class="w-12 h-10 flex items-center justify-center font-bold text-gray-400">〈</button>
+            
+            <div class="flex items-center space-x-1 text-lg">
+                <select id="yearSelect" onchange="onPickerChange()"></select>
+                <span class="text-gray-400 font-light">年</span>
+                <select id="monthSelect" onchange="onPickerChange()">
+                    <option value="0">1</option><option value="1">2</option><option value="2">3</option>
+                    <option value="3">4</option><option value="4">5</option><option value="5">6</option>
+                    <option value="6">7</option><option value="7">8</option><option value="8">9</option>
+                    <option value="9">10</option><option value="10">11</option><option value="11">12</option>
+                </select>
+                <span class="text-gray-400 font-light">月</span>
+            </div>
+            
+            <button onclick="changeMonth(1)" class="w-12 h-10 flex items-center justify-center font-bold text-gray-400">〉</button>
         </div>
     </header>
 
@@ -93,11 +101,11 @@
             <div class="calendar-grid text-center text-xs font-bold text-gray-400 mb-2 tracking-widest">
                 <div class="text-red-500 py-2">日</div><div>一</div><div>二</div><div>三</div><div>四</div><div>五</div><div class="text-red-500 py-2">六</div>
             </div>
-            <div id="calendarDays" class="calendar-grid rounded-xl overflow-hidden border border-gray-100 shadow-sm"></div>
+            <div id="calendarDays" class="calendar-grid rounded-2xl overflow-hidden border border-gray-100 shadow-sm"></div>
         </div>
 
         <div class="relative">
-            <div id="detailPanel" class="bg-white p-6 rounded-2xl border border-gray-100 shadow-lg relative overflow-hidden min-h-[400px]"></div>
+            <div id="detailPanel" class="bg-white p-6 rounded-3xl border border-gray-100 shadow-xl relative overflow-hidden min-h-[450px]"></div>
             <div id="copyTip" class="absolute top-4 right-4 bg-stone-800 text-white text-[10px] px-2 py-1 rounded z-50">已複製</div>
         </div>
     </div>
@@ -110,18 +118,18 @@
         '塑绘': '塑繪', '行丧': '行喪', '词讼': '詞訟', '置产': '置產', '入殓': '入殮', '開渠': '開渠', 
         '谢土': '謝土', '启钻': '啟鑽', '安机械': '安機械','造桥':'造橋',
         '诸事不宜': '諸事不宜', '诸事无忌': '諸事無忌', '嫁娶': '嫁娶', '祭祀': '祭祀', '祈福': '祈福', '斋醮': '齋醮',
-        '動土': '動土', '移徙': '移徙', '入宅': '入宅', '修造': '修造', '安葬': '安葬', '立碑': '立碑', '修坟': '修墳',
-        '成服': '成服', '除服': '除服', '纳采': '納採', '訂盟': '訂盟', '纳婿': '納婿', '安床': '安床', '開光': '開光',
-        '经络': '經絡', '解除': '解除', '竖柱': '豎柱', '上梁': '上樑', '盖屋': '蓋屋', '纳財': '納財', '開市': '開市',
+        '动土': '動土', '移徙': '移徙', '入宅': '入宅', '修造': '修造', '安葬': '安葬', '立碑': '立碑', '修坟': '修墳',
+        '成服': '成服', '除服': '除服', '纳采': '納彩', '订盟': '訂盟', '纳婿': '納婿', '安床': '安床', '开光': '開光',
+        '经絡': '經絡', '解除': '解除', '竖柱': '豎柱', '上梁': '上樑', '盖屋': '蓋屋', '纳財': '納財', '开市': '開市',
         '交易': '交易', '立券': '立券', '挂匾': '掛匾', '出行': '出行', '理发': '理髮', '安门': '安門', '修饰垣墙': '修飾垣牆',
-        '造畜稠': '造畜稠', '作灶': '作灶', '放水': '放水', '掘井': '掘井', '開池': '開池', '開廁': '開廁', '破土': '破土',
+        '造畜稠': '造畜稠', '作灶': '作灶', '放水': '放水', '掘井': '掘井', '开池': '開池', '开廁': '開廁', '破土': '破土','进人口': '進人口','无': '無',
         '启攒': '啟攢', '掃舍': '掃舍', '平治道涂': '平治道塗', '馀事勿取': '餘事勿取', '求嗣': '求嗣', '伐木': '伐木',
-        '畋猎': '畋獵', '捕捉': '捕捉', '結網': '結網', '取漁': '取漁', '教牛马': '教牛馬', '開生墳': '開生墳',
+        '畋猎': '畋獵', '捕捉': '捕捉', '結網': '結網', '取漁': '取漁', '教牛马': '教牛馬', '开生坟': '開生墳',
         '惊蛰': '驚蟄', '小满': '小滿', '芒种': '芒種', '处暑': '處暑', '白露': '白露', '寒露': '寒露', '霜降': '霜降','開倉': '開倉','出货财': '出貨財','腊月': '臘月','纳财': '納財',
-        '龍': '龍', '馬': '馬', '雞': '雞', '豬': '豬', '屬': '屬',
-        '沖': '沖', '煞': '煞', '東': '東', '西': '西', '南': '南', '北': '北', '正東': '正東', '正西': '正西', '正南': '正南', '正北': '正北',
-        '炉中火': '爐中火', '劍鋒金': '劍鋒金', '山頭火': '山頭火', '澗下水': '澗下水', '城頭土': '城頭土', '白蠟金': '白蠟金', '楊柳木': '楊柳木', '泉中水': '泉中水', '屋上土': '屋上土', '霹靂火': '霹靂火', '松柏木': '松柏木', '長流水': '長流水', '沙中金': '沙中金', '山下火': '山下火', '平地木': '平地木', '壁上土': '壁上土', '金箔金': '金箔金', '佛燈火': '佛燈火', '天河水': '天河水', '驛馬': '驛馬',
-        '春节': '春節', '元宵節': '元宵節', '端午節': '端午節', '七夕節': '七夕節', '中秋節': '中秋節', '重陽節': '重陽節', '除夕': '除夕'
+        '龙': '龍', '马': '馬', '鸡': '雞', '猪': '豬', '属': '屬',
+        '沖': '沖', '煞': '煞', '东': '東', '西': '西', '南': '南', '北': '北', '正东': '正東', '正西': '正西', '正南': '正南', '正北': '正北',
+        '炉中火': '爐中火', '剑锋金': '劍鋒金', '山头火': '山頭火', '涧下水': '澗下水', '城头土': '城頭土', '白蜡金': '白蠟金', '杨柳木': '楊柳木', '泉中水': '泉中水', '屋上土': '屋上土', '霹雳火': '霹靂火', '松柏木': '松柏木', '长流水': '長流水', '沙中金': '沙中金', '山下火': '山下火', '平地木': '平地木', '壁上土': '壁上土', '金箔金': '金箔金', '佛燈火': '佛燈火', '天河水': '天河水', '驿马': '驛馬',
+        '春节': '春節', '元宵节': '元宵節', '端午节': '端午節', '七夕节': '七夕節', '中秋节': '中秋節', '重陽节': '重陽節', '除夕': '除夕'
     };
 
     function toTraditional(text) {
@@ -136,10 +144,32 @@
 
     let currentDate = new Date();
 
+    // 初始化年份選單 (1900-2100)
+    function initPicker() {
+        const yearSelect = document.getElementById('yearSelect');
+        for (let y = 1900; y <= 2100; y++) {
+            const opt = document.createElement('option');
+            opt.value = y;
+            opt.innerText = y;
+            yearSelect.appendChild(opt);
+        }
+    }
+
+    // 當下拉選單改變時
+    function onPickerChange() {
+        const y = document.getElementById('yearSelect').value;
+        const m = document.getElementById('monthSelect').value;
+        currentDate = new Date(y, m, 1);
+        renderCalendar();
+    }
+
     function renderCalendar() {
         const year = currentDate.getFullYear();
         const month = currentDate.getMonth();
-        document.getElementById('monthTitle').innerText = `${year} / ${month + 1}`;
+        
+        // 同步選單數值
+        document.getElementById('yearSelect').value = year;
+        document.getElementById('monthSelect').value = month;
 
         const firstDay = new Date(year, month, 1).getDay();
         const lastDate = new Date(year, month + 1, 0).getDate();
@@ -192,38 +222,38 @@
                 <div class="flex justify-between items-center mb-4">
                     <div class="text-xs tracking-tighter text-gray-400 uppercase font-bold">${y}年${m+1}月${d}日</div>
                     <button onclick="copyInfo('${y}/${m+1}/${d} 農曆${toTraditional(lunar.getMonthInChinese())}月${toTraditional(lunar.getDayInChinese())} 宜:${yiList.join(',')} 忌:${jiList.join(',')}')" 
-                            class="text-[10px] text-gray-400 border px-2 py-1 rounded-full">複製</button>
+                            class="text-[10px] text-gray-400 border px-3 py-1 rounded-full">複製資訊</button>
                 </div>
                 
-                ${festivals.length > 0 ? `<div class="festival-tag rounded-full">慶 · ${festivals[0]}</div>` : ''}
+                ${festivals.length > 0 ? `<div class="festival-tag rounded-lg">慶 · ${festivals[0]}</div>` : ''}
                 
                 <div class="text-6xl font-light serif mb-4">${d}</div>
                 
                 <div class="space-y-1 border-b border-gray-100 pb-4 mb-4">
-                    <div class="text-xl font-bold serif">農曆 ${toTraditional(lunar.getMonthInChinese())}月${toTraditional(lunar.getDayInChinese())}</div>
-                    <div class="text-gray-500 text-xs">
+                    <div class="text-2xl font-bold serif">農曆 ${toTraditional(lunar.getMonthInChinese())}月${toTraditional(lunar.getDayInChinese())}</div>
+                    <div class="text-gray-500 text-xs font-medium">
                         ${toTraditional(lunar.getYearInGanZhi())}(${toTraditional(lunar.getYearShengXiao())})年 · 
                         ${toTraditional(lunar.getMonthInGanZhi())}月 · 
                         ${toTraditional(lunar.getDayInGanZhi())}日
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 gap-4">
+                <div class="grid grid-cols-1 gap-6">
                     <div>
-                        <div class="text-lg font-bold text-red-700 mb-1">【宜】</div>
-                        <div class="flex flex-wrap text-sm font-medium text-red-600 gap-2">
-                            ${yiList.length > 0 ? yiList.map(item => `<span class="bg-red-50 px-2 py-1 rounded">${item}</span>`).join('') : '諸事不宜'}
+                        <div class="text-2xl font-bold text-red-700 mb-2 tracking-widest">【宜】</div>
+                        <div class="flex flex-wrap text-base font-medium text-red-600 gap-x-3 gap-y-2">
+                            ${yiList.length > 0 ? yiList.map(item => `<span class="underline decoration-red-100 underline-offset-4">${item}</span>`).join('') : '諸事不宜'}
                         </div>
                     </div>
                     <div>
-                        <div class="text-lg font-bold text-gray-900 mb-1">【忌】</div>
-                        <div class="flex flex-wrap text-sm font-medium text-black gap-2">
-                            ${jiList.length > 0 ? jiList.map(item => `<span class="bg-gray-100 px-2 py-1 rounded">${item}</span>`).join('') : '諸事無忌'}
+                        <div class="text-2xl font-bold text-gray-900 mb-2 tracking-widest">【忌】</div>
+                        <div class="flex flex-wrap text-base font-medium text-black gap-x-3 gap-y-2">
+                            ${jiList.length > 0 ? jiList.map(item => `<span class="underline decoration-gray-200 underline-offset-4">${item}</span>`).join('') : '諸事無忌'}
                         </div>
                     </div>
                 </div>
 
-                <div class="mt-6 pt-4 border-t border-gray-100 text-[10px] text-gray-400 space-y-1">
+                <div class="mt-8 pt-4 border-t border-gray-100 text-[11px] text-gray-400 space-y-1 leading-relaxed">
                     <div>節氣：<span class="text-gray-600 font-medium">${toTraditional(lunar.getJieQi()) || '無'}</span></div>
                     <div>沖煞：<span class="text-gray-600 font-medium">${toTraditional(lunar.getDayChongDesc())}</span></div>
                     <div>五行：<span class="text-gray-600 font-medium">${toTraditional(lunar.getDayNaYin())}</span></div>
@@ -250,6 +280,7 @@
         renderCalendar();
     }
 
+    initPicker();
     renderCalendar();
 </script>
 
