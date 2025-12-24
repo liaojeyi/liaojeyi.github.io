@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>專業八字命盤與流年分析</title>
+    <script src="https://cdn.jsdelivr.net/npm/lunar-javascript/lunar.js"></script>
+    <style>
+        :root { --primary: #c0392b; --secondary: #d35400; --bg: #fdfaf6; }
+        body { font-family: -apple-system, "Noto Sans TC", sans-serif; background-color: var(--bg); margin: 0; padding: 15px; color: #333; }
+        .container { max-width: 500px; margin: 0 auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); border: 1px solid #eee; }
+        h2 { text-align: center; color: var(--primary); margin-bottom: 20px; }
+        .form-group { margin-bottom: 12px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 14px; }
+        input, select { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; font-size: 16px; -webkit-appearance: none; }
+        button { width: 100%; padding: 15px; background: var(--primary); color: white; border: none; border-radius: 6px; font-size: 18px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        
+        #result { margin-top: 25px; display: none; border-top: 2px dashed #eee; padding-top: 20px; }
+        .bazi-table { width: 100%; border-collapse: collapse; margin: 15px 0; background: #fff; }
+        .bazi-table th, .bazi-table td { border: 1px solid #ddd; padding: 12px 5px; text-align: center; width: 25%; }
+        .bazi-table th { background: #f8f8f8; font-size: 13px; color: #777; }
+        .ganzhi { font-size: 22px; font-weight: bold; color: #222; line-height: 1.2; }
+        
+        .section-title { background: var(--primary); color: white; padding: 5px 12px; border-radius: 4px; display: inline-block; margin-bottom: 10px; font-size: 14px; }
+        .card { background: #fffcf5; padding: 15px; border: 1px solid #f1e0c6; border-radius: 8px; margin-bottom: 15px; line-height: 1.6; font-size: 15px; }
+        .highlight { color: var(--primary); font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>🔮 八字命盤分析</h2>
+    
+    <div class="form-group">
+        <label>公曆出生日期</label>
+        <input type="date" id="birthDate" value="1995-01-01">
+    </div>
+    <div class="form-group">
+        <label>出生時辰</label>
+        <select id="birthHour">
+            <option value="0">00:00 - 00:59 (子時)</option>
+            <option value="1">01:00 - 02:59 (丑時)</option>
+            <option value="3">03:00 - 04:59 (寅時)</option>
+            <option value="5">05:00 - 06:59 (卯時)</option>
+            <option value="7">07:00 - 08:59 (辰時)</option>
+            <option value="9">09:00 - 10:59 (巳時)</option>
+            <option value="11">11:00 - 12:59 (午時)</option>
+            <option value="13">13:00 - 14:59 (未時)</option>
+            <option value="15">15:00 - 16:59 (申時)</option>
+            <option value="17">17:00 - 18:59 (酉時)</option>
+            <option value="19">19:00 - 20:59 (戌時)</option>
+            <option value="21">21:00 - 22:59 (亥時)</option>
+            <option value="23">23:00 - 23:59 (子時)</option>
+        </select>
+    </div>
+    
+    <button onclick="calculateBazi()">開始排盤分析</button>
+
+    <div id="result">
+        <div class="section-title">農曆與排盤</div>
+        <div id="lunarInfo" style="margin-bottom:10px; font-size:14px;"></div>
+        
+        <table class="bazi-table">
+            <thead>
+                <tr><th>年柱</th><th>月柱</th><th>日柱</th><th>時柱</th></tr>
+            </thead>
+            <tbody id="baziGanzhi"></tbody>
+        </table>
+
+        <div class="section-title">命格性格分析</div>
+        <div class="card" id="characterAnalysis"></div>
+
+        <div class="section-title" id="yearTitle">流年運勢建議</div>
+        <div class="card" style="border-left: 5px solid #d35400;" id="fortuneAnalysis"></div>
+    </div>
+</div>
+
+<script>
+    function calculateBazi() {
+        try {
+            const dateInput = document.getElementById('birthDate').value;
+            const hour = parseInt(document.getElementById('birthHour').value);
+            
+            if (!dateInput) {
+                alert('請先選擇出生日期');
+                return;
+            }
+
+            const d = new Date(dateInput);
+            // 初始化 Lunar 物件
+            const solar = Solar.fromYmdHms(d.getFullYear(), d.getMonth() + 1, d.getDate(), hour, 0, 0);
+            const lunar = solar.getLunar();
+            const eb = lunar.getEightChar();
+            
+            // 1. 顯示農曆資訊
+            document.getElementById('lunarInfo').innerHTML = `
+                📅 農曆：${lunar.getYearInGanZhi()}年 ${lunar.getMonthInChinese()}月 ${lunar.getDayInChinese()}<br>
+                🐾 生肖：屬${lunar.getYearShengXiao()}
+            `;
+
+            // 2. 顯示八字
+            const baziRow = `
+                <tr>
+                    <td class="ganzhi">${eb.getYearGan()}<br>${eb.getYearZhi()}</td>
+                    <td class="ganzhi">${eb.getMonthGan()}<br>${eb.getMonthZhi()}</td>
+                    <td class="ganzhi">${eb.getDayGan()}<br>${eb.getDayZhi()}</td>
+                    <td class="ganzhi">${eb.getHourGan()}<br>${eb.getHourZhi()}</td>
+                </tr>
+            `;
+            document.getElementById('baziGanzhi').innerHTML = baziRow;
+
+            // 3. 性格分析 (基於日元)
+            const dayGan = eb.getDayGan();
+            const charData = getCharacterData(dayGan);
+            document.getElementById('characterAnalysis').innerHTML = `
+                您的日元為「<span class="highlight">${dayGan}</span>」，屬於 <span class="highlight">${charData.element}</span>。<br>
+                ${charData.desc}
+            `;
+
+            // 4. 流年分析 (當前年份)
+            const currentYear = new Date().getFullYear();
+            const currentLunar = Lunar.fromDate(new Date());
+            const currentYearGanZhi = currentLunar.getYearInGanZhi();
+            const currentYearGan = currentYearGanZhi.substring(0, 1);
+            
+            document.getElementById('yearTitle').innerText = `${currentYear} (${currentYearGanZhi}) 流年運勢`;
+            document.getElementById('fortuneAnalysis').innerHTML = getFortuneAdvice(dayGan, currentYearGan);
+
+            // 顯示結果區域
+            document.getElementById('result').style.display = 'block';
+            window.scrollTo({ top: document.getElementById('result').offsetTop, behavior: 'smooth' });
+
+        } catch (error) {
+            console.error(error);
+            alert('程式執行出錯：' + error.message + '\n請檢查網路連線或稍後再試。');
+        }
+    }
+
+    function getCharacterData(gan) {
+        const mapping = {
+            '甲': { element: '陽木', desc: '如參天大樹，充滿仁慈之心，向上發展的動力強。性格正直，但有時過於固執，不擅長變通。' },
+            '乙': { element: '陰木', desc: '如攀援藤蔓，生命力極強且溫柔體貼。適應能力優異，但容易受環境影響而缺乏主見。' },
+            '丙': { element: '陽火', desc: '如太陽般熱烈，熱情大方，直爽且充滿正能量。缺點是脾氣來得快去得也快，有時缺乏耐性。' },
+            '丁': { element: '陰火', desc: '如燭光燈火，溫暖細膩，觀察力極強。外表平靜但內心思考很多，屬於大器晚成的類型。' },
+            '戊': { element: '陽土', desc: '如高山厚土，穩重踏實，非常守信用。做事有始有終，但有時會給人沉悶、不夠浪漫的感覺。' },
+            '己': { element: '陰土', desc: '如田園之土，包容力極大，多才多藝。內心細膩且懂得體諒他人，但有時容易糾結於小事。' },
+            '庚': { element: '陽金', desc: '如剛鐵利劍，剛毅果斷，極具俠義心腸。辦事效率高，但說話過於直白，容易在無意中得罪人。' },
+            '辛': { element: '陰金', desc: '如珠寶首飾，精緻華美，自尊心強。追求生活品質，腦袋靈活，但要注意過於敏感。' },
+            '壬': { element: '陽水', desc: '如江河大海，有大智慧，格局廣闊。喜歡自由奔放的感覺，聰明但有時會因太過隨性而錯失良機。' },
+            '癸': { element: '陰水', desc: '如雨露清泉，柔情且內斂，想像力豐富。懂得運用柔性力量解決問題，但情緒起伏相對較大。' }
+        };
+        return mapping[gan];
+    }
+
+    function getFortuneAdvice(dayGan, yearGan) {
+        const elements = {
+            '甲': '木', '乙': '木', '丙': '火', '丁': '火', '戊': '土', 
+            '己': '土', '庚': '金', '辛': '金', '壬': '水', '癸': '水'
+        };
+        
+        const self = elements[dayGan];
+        const year = elements[yearGan];
+
+        // 簡易五行關係判斷流年
+        if (self === year) {
+            return `<b>【同氣相求】</b>：今年競爭壓力較大，會遇到很多志同道合的朋友或競爭對手。建議多聽取他人意見，不宜孤軍奮戰，防財物損耗。`;
+        }
+        
+        const relations = {
+            '木': { '火': '食傷流年：才華發揮之年，利求學、創意。', '土': '財星流年：機會變多，財運較旺，利於求財。', '金': '官殺流年：壓力較大，利於晉升但要注意過勞。', '水': '印星流年：貴人運旺，適合學習與調養生息。' },
+            '火': { '土': '食傷流年：思維活躍，適合展現自我，注意口舌。', '金': '財星流年：財運走強，利於經商或投資。', '木': '印星流年：長輩緣佳，能得到長輩或上司的提攜。', '水': '官殺流年：責任加重，需謹言慎行，注意職場關係。' },
+            '土': { '金': '食傷流年：情緒起伏較大，宜放鬆心情，利於藝術與表達。', '水': '財星流年：財源廣進，感情生活較豐富。', '火': '印星流年：心靈成長之年，適合購買房產或安頓生活。', '木': '官殺流年：面臨挑戰與規範，是磨練意志的好時機。' },
+            '金': { '水': '食傷流年：創意噴發，利於業務開拓，注意保重身體。', '木': '財星流年：利於業務收益，勞而有獲。', '土': '印星流年：貴人扶持，穩定中求發展。', '火': '官殺流年：權力職位提升之年，壓力伴隨機遇。' },
+            '水': { '木': '食傷流年：行動力強，適合開展新計畫，利
