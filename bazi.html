@@ -3,178 +3,763 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
-    <title>專業八字命盤分析 2025</title>
-    <script src="https://unpkg.com/lunar-javascript/lunar.js"></script>
+    <title>專業八字命盤分析</title>
+    <script src="https://cdn.jsdelivr.net/npm/lunar-javascript/lunar.js"></script>
     <style>
-        :root { --main-red: #b33939; --bg-gold: #f7f1e3; }
-        body { font-family: -apple-system, sans-serif; background: #f0f0f0; margin: 0; padding: 10px; }
-        .app-container { max-width: 600px; margin: auto; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        .header { background: var(--main-red); color: white; padding: 20px; text-align: center; }
-        .content { padding: 20px; }
-        .input-group { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 5px; font-weight: bold; color: #333; }
-        input, select { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; font-size: 16px; box-sizing: border-box; }
-        
-        button { 
-            width: 100%; padding: 15px; background: var(--main-red); color: white; 
-            border: none; border-radius: 8px; font-size: 18px; font-weight: bold; 
-            cursor: pointer; transition: 0.3s;
+        body { 
+            font-family: -apple-system, sans-serif; 
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            margin: 0; 
+            padding: 15px; 
+            color: #333; 
+            line-height: 1.6;
+            min-height: 100vh;
         }
-        button:disabled { background: #ccc; }
-
-        #result { display: none; margin-top: 20px; border-top: 2px solid #eee; padding-top: 20px; }
-        .bazi-box { display: flex; justify-content: space-between; margin: 15px 0; }
-        .bazi-item { flex: 1; text-align: center; background: var(--bg-gold); margin: 2px; padding: 10px; border-radius: 4px; }
-        .bazi-label { font-size: 12px; color: #666; }
-        .bazi-val { font-size: 20px; font-weight: bold; color: #222; }
+        .card { 
+            max-width: 480px; 
+            margin: 0 auto; 
+            background: #fff; 
+            border-radius: 16px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15); 
+            overflow: hidden; 
+        }
+        .header { 
+            background: linear-gradient(to right, #b33939, #d63031); 
+            color: #fff; 
+            padding: 18px; 
+            text-align: center; 
+            font-size: 22px; 
+            font-weight: bold; 
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.3);
+        }
+        .p-20 { 
+            padding: 20px; 
+        }
+        label { 
+            display: block; 
+            margin-bottom: 8px; 
+            font-weight: bold; 
+            color: #555;
+        }
+        input, select { 
+            width: 100%; 
+            padding: 14px; 
+            margin-bottom: 22px; 
+            border: 2px solid #e0e0e0; 
+            border-radius: 10px; 
+            font-size: 16px; 
+            box-sizing: border-box; 
+            transition: border 0.3s;
+        }
+        input:focus, select:focus {
+            border-color: #b33939;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(179, 57, 57, 0.1);
+        }
+        button { 
+            width: 100%; 
+            padding: 17px; 
+            background: linear-gradient(to right, #b33939, #d63031); 
+            color: white; 
+            border: none; 
+            border-radius: 10px; 
+            font-size: 18px; 
+            font-weight: bold; 
+            cursor: pointer; 
+            transition: all 0.3s;
+            box-shadow: 0 4px 6px rgba(179, 57, 57, 0.2);
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(179, 57, 57, 0.3);
+        }
         
-        .card { background: #fff9e6; border-left: 4px solid var(--main-red); padding: 15px; margin-bottom: 15px; line-height: 1.6; }
-        .fortune-title { color: var(--main-red); font-weight: bold; margin-bottom: 8px; border-bottom: 1px solid #ddd; }
+        #result { 
+            display: none; 
+            margin-top: 25px; 
+            border-top: 2px solid #eee; 
+            padding-top: 20px; 
+            animation: fadeIn 0.5s ease;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .bazi-row { 
+            display: flex; 
+            justify-content: space-between; 
+            margin: 20px 0; 
+        }
+        .bazi-item { 
+            flex: 1; 
+            text-align: center; 
+            background: linear-gradient(145deg, #fff9e6, #ffeaa7); 
+            margin: 0 3px; 
+            padding: 12px 5px; 
+            border-radius: 8px; 
+            border: 2px solid #fdcb6e;
+            box-shadow: 0 3px 5px rgba(0,0,0,0.05);
+        }
+        .bazi-t { 
+            font-size: 13px; 
+            color: #888; 
+            margin-bottom: 5px;
+        }
+        .bazi-v { 
+            font-size: 22px; 
+            font-weight: bold; 
+            color: #d63031; 
+            text-shadow: 1px 1px 1px rgba(0,0,0,0.1);
+        }
+        
+        .desc-box { 
+            background: #f9f9f9; 
+            border-left: 5px solid #b33939; 
+            padding: 18px; 
+            margin-top: 25px; 
+            font-size: 15px; 
+            line-height: 1.7;
+            border-radius: 0 10px 10px 0;
+            transition: transform 0.3s;
+        }
+        .desc-box:hover {
+            transform: translateX(5px);
+        }
+        .blue-border { 
+            border-left-color: #2980b9; 
+            background: linear-gradient(to right, #f0f7ff, #e3f2fd); 
+        }
+        .green-border { 
+            border-left-color: #27ae60; 
+            background: linear-gradient(to right, #f0fff4, #e8f5e9); 
+        }
+        
+        .fortune-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin: 18px 0;
+        }
+        
+        .fortune-category {
+            background: rgba(255,255,255,0.8);
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #eee;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        
+        h3 {
+            color: #b33939;
+            margin-top: 0;
+            margin-bottom: 12px;
+            font-size: 19px;
+            border-bottom: 2px solid #ffeaa7;
+            padding-bottom: 6px;
+        }
+        
+        .blue-border h3 {
+            color: #2980b9;
+            border-bottom-color: #a5d8ff;
+        }
+        
+        .green-border h3 {
+            color: #27ae60;
+            border-bottom-color: #a3e4d7;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 25px;
+            color: #666;
+            font-style: italic;
+        }
+        
+        .year-tabs {
+            display: flex;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #eee;
+        }
+        
+        .year-tab {
+            flex: 1;
+            padding: 12px;
+            text-align: center;
+            background: #f8f9fa;
+            border: none;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            border-radius: 8px 8px 0 0;
+            margin-right: 5px;
+        }
+        
+        .year-tab.active {
+            background: #b33939;
+            color: white;
+        }
+        
+        .year-tab.blue {
+            background: #f0f7ff;
+        }
+        
+        .year-tab.blue.active {
+            background: #2980b9;
+        }
+        
+        .year-tab.green {
+            background: #f0fff4;
+        }
+        
+        .year-tab.green.active {
+            background: #27ae60;
+        }
+        
+        .year-content {
+            display: none;
+        }
+        
+        .year-content.active {
+            display: block;
+        }
+        
+        @media (max-width: 480px) {
+            .fortune-grid {
+                grid-template-columns: 1fr;
+            }
+            .bazi-item {
+                padding: 10px 3px;
+            }
+            .bazi-v {
+                font-size: 20px;
+            }
+        }
+        
+        .tip-box {
+            background: #fffde7;
+            border-left: 4px solid #fdcb6e;
+            padding: 12px;
+            margin: 15px 0;
+            border-radius: 0 8px 8px 0;
+            font-size: 14px;
+            color: #666;
+        }
     </style>
 </head>
 <body>
 
-<div class="app-container">
-    <div class="header">
-        <h2 style="margin:0">🔮 八字命盤分析</h2>
-        <small id="statusText">系統初始化中...</small>
-    </div>
+<div class="card">
+    <div class="header">🔮 八字命盤分析系統</div>
+    <div class="p-20">
+        <label>公曆出生日期</label>
+        <input type="date" id="myDate" value="1995-01-01">
+        
+        <label>出生時辰</label>
+        <select id="myHour">
+            <option value="0">00:00 (子時)</option><option value="1">01:00 (丑時)</option>
+            <option value="3">03:00 (寅時)</option><option value="5">05:00 (卯時)</option>
+            <option value="7">07:00 (辰時)</option><option value="9">09:00 (巳時)</option>
+            <option value="11">11:00 (午時)</option><option value="13">13:00 (未時)</option>
+            <option value="15">15:00 (申時)</option><option value="17">17:00 (酉時)</option>
+            <option value="19">19:00 (戌時)</option><option value="21">21:00 (亥時)</option>
+            <option value="23">23:00 (子時)</option>
+        </select>
 
-    <div class="content">
-        <div class="input-group">
-            <label>出生日期 (公曆)</label>
-            <input type="date" id="birthDate" value="1995-01-01">
-        </div>
-        <div class="input-group">
-            <label>出生時辰</label>
-            <select id="birthHour">
-                <option value="0">00:00 - 子時</option>
-                <option value="1">01:00 - 丑時</option>
-                <option value="3">03:00 - 寅時</option>
-                <option value="5">05:00 - 卯時</option>
-                <option value="7">07:00 - 辰時</option>
-                <option value="9">09:00 - 巳時</option>
-                <option value="11">11:00 - 午時</option>
-                <option value="13">13:00 - 未時</option>
-                <option value="15">15:00 - 申時</option>
-                <option value="17">17:00 - 酉時</option>
-                <option value="19">19:00 - 戌時</option>
-                <option value="21">21:00 - 亥時</option>
-                <option value="23">23:00 - 子時</option>
-            </select>
-        </div>
-        <button id="calcBtn" onclick="mainHandler()" disabled>正在載入計算模組...</button>
+        <button onclick="run()">開始分析</button>
 
         <div id="result">
-            <div id="lunarDate" style="text-align:center; font-weight:bold; color:#b33939; margin-bottom:10px;"></div>
+            <div id="lunarInfo" style="text-align:center; color:#b33939; font-weight:bold; margin-bottom:15px; padding:12px; background:#fff9e6; border-radius:8px; border:1px solid #ffeaa7;"></div>
             
-            <div class="bazi-box" id="baziDisplay"></div>
+            <div class="bazi-row" id="baziDisplay"></div>
 
-            <div class="card">
-                <div class="fortune-title">🌟 性格命格解析</div>
-                <div id="characterText"></div>
+            <div class="desc-box">
+                <b style="color:#b33939; font-size:18px;">【日元與性格分析】</b><br>
+                <div id="charText" class="loading">分析中...</div>
             </div>
 
-            <div class="card" style="background-color: #f0f7ff; border-left-color: #2980b9;">
-                <div class="fortune-title" style="color:#2980b9">📅 2025 乙巳年流年運勢</div>
-                <div id="fortuneText"></div>
+            <div class="year-tabs">
+                <button class="year-tab blue active" onclick="switchYear('2025')">2025乙巳年</button>
+                <button class="year-tab green" onclick="switchYear('2026')">2026丙午年</button>
+            </div>
+            
+            <div class="desc-box blue-border">
+                <div id="year2025Content" class="year-content active">
+                    <b style="color:#2980b9; font-size:18px;">【2025 乙巳年運勢建議】</b><br>
+                    <div id="yearText2025" class="loading">分析中...</div>
+                </div>
+                
+                <div id="year2026Content" class="year-content">
+                    <b style="color:#27ae60; font-size:18px;">【2026 丙午年運勢建議】</b><br>
+                    <div id="yearText2026" class="loading">分析中...</div>
+                </div>
+            </div>
+            
+            <div class="tip-box">
+                💡 提示：點擊上方年份標籤可切換不同年份的運勢分析。運勢分析僅供參考，命運掌握在自己手中。
             </div>
         </div>
     </div>
 </div>
 
 <script>
-    // 檢查庫是否加載成功
-    window.onload = function() {
-        if (typeof Solar !== 'undefined') {
-            document.getElementById('calcBtn').disabled = false;
-            document.getElementById('calcBtn').innerText = '開始排盤分析';
-            document.getElementById('statusText').innerText = '系統準備就緒';
-        } else {
-            document.getElementById('statusText').innerText = '核心庫載入失敗，請檢查網路後重新整理';
-            document.getElementById('statusText').style.color = 'yellow';
+    // 日元分析資料
+    const dayAnalysisMap = {
+        '甲': {
+            title: '甲木（陽木）— 大樹之命',
+            characteristics: '正直不阿、積極進取、有領導才能、責任感強',
+            strengths: '堅韌不拔、誠實可靠、有開創精神、做事有計劃',
+            weaknesses: '過於固執、缺乏變通、有時過於自我、易忽略他人感受',
+            careerSuggestions: '適合管理職、建築業、木材相關產業、教育行業',
+            relationshipAdvice: '需學習傾聽與妥協，避免過度強勢'
+        },
+        '乙': {
+            title: '乙木（陰木）— 花草之命',
+            characteristics: '溫柔體貼、適應力強、心思細膩、富有同情心',
+            strengths: '靈活變通、善於溝通、有藝術天分、體貼他人',
+            weaknesses: '內心敏感、容易猶豫、缺乏主見、抗壓性較弱',
+            careerSuggestions: '適合藝術創作、諮詢服務、園藝設計、文書工作',
+            relationshipAdvice: '需建立自信心，學會表達自己的真實想法'
+        },
+        '丙': {
+            title: '丙火（陽火）— 太陽之命',
+            characteristics: '熱情開朗、光明磊落、積極主動、感染力強',
+            strengths: '樂觀進取、領導能力強、執行力高、善於鼓舞他人',
+            weaknesses: '脾氣急躁、缺乏耐心、有時過於衝動、容易三分鐘熱度',
+            careerSuggestions: '適合演藝事業、銷售行業、公關活動、能源產業',
+            relationshipAdvice: '需學習控制情緒，培養耐心與持續力'
+        },
+        '丁': {
+            title: '丁火（陰火）— 燈燭之命',
+            characteristics: '心思細膩、觀察入微、溫和有禮、重視細節',
+            strengths: '思慮周全、有耐心、注重禮節、善於策劃',
+            weaknesses: '容易憂慮、多疑心、缺乏安全感、易鑽牛角尖',
+            careerSuggestions: '適合研究分析、策劃工作、心理諮詢、精密技術',
+            relationshipAdvice: '需學習信任他人，避免過度擔心未發生的事'
+        },
+        '戊': {
+            title: '戊土（陽土）— 高山之命',
+            characteristics: '穩重可靠、誠實守信、有包容力、做事踏實',
+            strengths: '責任感強、值得信賴、有耐心、實事求是',
+            weaknesses: '過於保守、缺乏變通、反應較慢、不善表達',
+            careerSuggestions: '適合房地產、建築工程、金融管理、農業相關',
+            relationshipAdvice: '需學習表達情感，增加生活情趣'
+        },
+        '己': {
+            title: '己土（陰土）— 田園之命',
+            characteristics: '包容力強、溫和謙遜、有耐心、善於協調',
+            strengths: '適應力強、善於溝通、有服務精神、懂得變通',
+            weaknesses: '優柔寡斷、缺乏主見、容易妥協、自信心不足',
+            careerSuggestions: '適合行政工作、人力資源、服務業、農業相關',
+            relationshipAdvice: '需培養決斷力，勇敢表達自己的意見'
+        },
+        '庚': {
+            title: '庚金（陽金）— 鋼鐵之命',
+            characteristics: '剛毅果決、正義感強、有原則、不畏挑戰',
+            strengths: '意志堅定、執行力強、講義氣、有擔當',
+            weaknesses: '過於剛強、說話直接、缺乏圓融、易得罪人',
+            careerSuggestions: '適合軍警職、法律工作、工程技術、機械相關',
+            relationshipAdvice: '需學習委婉表達，多考慮他人感受'
+        },
+        '辛': {
+            title: '辛金（陰金）— 珠寶之命',
+            characteristics: '心思細膩、追求完美、氣質優雅、重視外表',
+            strengths: '審美觀強、注重細節、有才華、善於交際',
+            weaknesses: '過於挑剔、愛面子、抗壓性低、容易悲觀',
+            careerSuggestions: '適合設計行業、珠寶業、金融分析、公關工作',
+            relationshipAdvice: '需學習接受不完美，降低對他人與自己的要求'
+        },
+        '壬': {
+            title: '壬水（陽水）— 江河之命',
+            characteristics: '聰明智慧、適應力強、心胸寬闊、有膽識',
+            strengths: '學習力強、有創意、善於應變、人緣佳',
+            weaknesses: '做事隨性、缺乏規劃、易虎頭蛇尾、自制力不足',
+            careerSuggestions: '適合貿易行業、運輸業、旅遊業、媒體工作',
+            relationshipAdvice: '需培養紀律性，學習制定與執行計劃'
+        },
+        '癸': {
+            title: '癸水（陰水）— 雨露之命',
+            characteristics: '心思細膩、直覺敏銳、溫柔體貼、富有同情心',
+            strengths: '觀察力強、善解人意、有藝術天分、適應力佳',
+            weaknesses: '情緒起伏大、多愁善感、容易退縮、缺乏行動力',
+            careerSuggestions: '適合藝術創作、心理諮詢、美容業、服務業',
+            relationshipAdvice: '需學習管理情緒，培養積極行動的習慣'
         }
     };
-
-    function mainHandler() {
+    
+    // 2025乙巳年運勢資料
+    const yearlyFortune2025Map = {
+        '甲': {
+            overall: '2025乙巳年對甲木日主是劫財坐食神的流年，機遇與挑戰並存。乙木為劫財，代表人際關係活躍但也帶來競爭；巳火為食神，代表才華展現與創意發揮。',
+            career: '職場上競爭加劇，但同時有展現能力的機會。利於團隊合作，但需注意人際關係，避免因過度自信而與同事產生摩擦。下半年有晉升或轉職機會。',
+            wealth: '財運起伏較大，正財穩定但偏財需謹慎。避免合夥投資，易有財務糾紛。理財宜保守，可考慮長期穩健型投資。',
+            health: '注意肝膽問題和壓力管理，適度運動有助於釋放壓力。春季需特別注意呼吸道健康。',
+            relationship: '感情上易有競爭者出現，單身者需主動出擊，已婚者需加強溝通。人際交往中需注意言行，避免無意中得罪人。',
+            auspiciousDirections: '東南方、西北方',
+            auspiciousColors: '綠色、藍色',
+            importantMonths: '農曆三月、七月、十一月'
+        },
+        '乙': {
+            overall: '2025乙巳年對乙木日主是比肩坐傷官的流年，才華得以發揮但壓力增加。乙木為比肩，代表同儕競爭與合作；巳火為傷官，代表創造力與表達欲增強。',
+            career: '競爭壓力大，但能憑藉專業能力脫穎而出。適合進修學習，提升技能。注意職場口舌是非，謹言慎行。',
+            wealth: '正財收入穩定，有意外之財機會但來去匆匆。不宜進行高風險投資。可考慮與創意相關的副業。',
+            health: '注意神經系統和腸胃問題，保持規律作息。夏季需防中暑與熱相關疾病。',
+            relationship: '人際關係活躍，但易有口舌是非。感情上需多些包容與理解，單身者易在學習場合遇到對象。',
+            auspiciousDirections: '東方、東南方',
+            auspiciousColors: '綠色、紅色',
+            importantMonths: '農曆二月、六月、十月'
+        },
+        '丙': {
+            overall: '2025乙巳年對丙火日主是正印坐比肩的流年，貴人運強，學習成長佳期。乙木為正印，代表長輩貴人與學習機會；巳火為比肩，代表人際支援與合作機會。',
+            career: '有上司或長輩提攜，利於職位晉升。適合考取證照、進修深造。團隊合作順暢，可藉助他人之力達成目標。',
+            wealth: '財運平穩上升，正財收入增加。適合長期穩健型投資，避免投機。下半年有意外收入機會。',
+            health: '注意心血管健康和眼睛保養，避免過度勞累。秋季需注意呼吸系統問題。',
+            relationship: '人際關係和諧，家庭運佳。單身者易透過長輩介紹認識對象，已有伴侶者感情穩定發展。',
+            auspiciousDirections: '南方、東南方',
+            auspiciousColors: '紅色、紫色',
+            importantMonths: '農曆四月、八月、十二月'
+        },
+        '丁': {
+            overall: '2025乙巳年對丁火日主是偏印坐劫財的流年，學習成長與人際互動並存。乙木為偏印，代表靈感與特殊才能；巳火為劫財，代表人際互動與資源分享。',
+            career: '靈感豐富，適合從事創意或研究工作。但需注意職場人際關係，避免與同事發生資源爭奪。',
+            wealth: '正財穩定，偏財需謹慎。不宜進行高風險投資，理財以保守為宜。',
+            health: '注意神經系統和睡眠品質，避免用腦過度。夏季需注意心血管健康。',
+            relationship: '人際關係複雜，需謹慎處理。感情上需多溝通，避免誤會產生。',
+            auspiciousDirections: '南方、西南方',
+            auspiciousColors: '紅色、黃色'
+        },
+        '戊': {
+            overall: '2025乙巳年對戊土日主是正官坐偏印的流年，事業發展與學習機會並存。乙木為正官，代表事業發展與責任；巳火為偏印，代表學習與思考。',
+            career: '事業發展順利，有晉升機會。適合進修學習，提升專業能力。但需注意職場壓力，適時放鬆。',
+            wealth: '正財收入增加，偏財運普通。適合穩健型投資，避免投機。',
+            health: '注意腸胃問題和壓力管理，保持規律作息。春季需注意肝膽健康。',
+            relationship: '感情穩定發展，單身者易在工作中認識對象。已婚者家庭和諧。',
+            auspiciousDirections: '中央、西南方',
+            auspiciousColors: '黃色、紅色'
+        },
+        '己': {
+            overall: '2025乙巳年對己土日主是七殺坐正印的流年，挑戰與機會並存。乙木為七殺，代表挑戰與壓力；巳火為正印，代表貴人與學習。',
+            career: '職場挑戰多，但同時有貴人相助。適合進修學習，提升競爭力。需注意工作壓力，適時調整。',
+            wealth: '財運起伏較大，正財穩定但偏財需謹慎。不宜進行高風險投資。',
+            health: '注意腸胃問題和壓力管理，保持規律作息。夏季需注意心血管健康。',
+            relationship: '感情上需多溝通，避免誤會產生。單身者易在學習場合認識對象。',
+            auspiciousDirections: '中央、南方',
+            auspiciousColors: '黃色、紅色'
+        },
+        '庚': {
+            overall: '2025乙巳年對庚金日主是正財坐七殺的流年，財運與挑戰並存。乙木為正財，代表穩定收入；巳火為七殺，代表挑戰與壓力。',
+            career: '事業發展順利，有晉升機會。但需注意職場競爭，適時展現能力。',
+            wealth: '正財收入增加，偏財運普通。適合穩健型投資，避免高風險。',
+            health: '注意呼吸系統和皮膚問題，保持良好作息。秋季需注意肺部健康。',
+            relationship: '感情穩定發展，單身者易在工作中認識對象。已婚者家庭和諧。',
+            auspiciousDirections: '西方、西北方',
+            auspiciousColors: '白色、金色'
+        },
+        '辛': {
+            overall: '2025乙巳年對辛金日主是偏財坐正官的流年，財運與事業發展並存。乙木為偏財，代表意外收入；巳火為正官，代表事業發展。',
+            career: '事業發展順利，有晉升機會。適合拓展業務，增加收入來源。',
+            wealth: '偏財運佳，有意外收入機會。但需謹慎理財，避免過度消費。',
+            health: '注意呼吸系統和皮膚問題，保持良好作息。夏季需注意心血管健康。',
+            relationship: '感情穩定發展，單身者易在社交場合認識對象。已婚者家庭和諧。',
+            auspiciousDirections: '西方、西北方',
+            auspiciousColors: '白色、金色'
+        },
+        '壬': {
+            overall: '2025乙巳年對壬水日主是傷官坐偏財的流年，才華發揮與財運並存。乙木為傷官，代表才華展現；巳火為偏財，代表意外收入。',
+            career: '才華得以發揮，適合從事創意工作。但需注意職場口舌，謹言慎行。',
+            wealth: '偏財運佳，有意外收入機會。但需謹慎理財，避免過度消費。',
+            health: '注意泌尿系統和腎臟問題，多喝水保持良好作息。冬季需注意腎臟健康。',
+            relationship: '感情上需多溝通，避免誤會產生。單身者易在創意場合認識對象。',
+            auspiciousDirections: '北方、西方',
+            auspiciousColors: '黑色、藍色'
+        },
+        '癸': {
+            overall: '2025乙巳年對癸水日主是食神坐正財的流年，生活享受與財運並存。乙木為食神，代表生活享受；巳火為正財，代表穩定收入。',
+            career: '工作順利，適合穩定發展。但需注意職場競爭，適時展現能力。',
+            wealth: '正財收入增加，偏財運普通。適合穩健型投資，避免高風險。',
+            health: '注意泌尿系統和腎臟問題，多喝水保持良好作息。秋季需注意腎臟健康。',
+            relationship: '感情穩定發展，單身者易在社交場合認識對象。已婚者家庭和諧。',
+            auspiciousDirections: '北方、西方',
+            auspiciousColors: '黑色、藍色'
+        }
+    };
+    
+    // 2026丙午年運勢資料
+    const yearlyFortune2026Map = {
+        '甲': {
+            overall: '2026丙午年對甲木日主是食神坐傷官的流年，才華得以充分展現。丙火為食神，代表創意與表達；午火為傷官，代表才華與技藝。',
+            career: '創意與才華得以發揮，適合從事藝術、設計、教育等行業。職場上有表現機會，但需注意與上司的溝通，避免因過度自信產生衝突。',
+            wealth: '財運來自才藝與創意，正財穩定，偏財機會多但需謹慎選擇。不宜進行高風險投資，理財以穩健為主。',
+            health: '注意心血管健康和眼睛問題，避免過度勞累。夏季火旺，需特別注意降溫防暑。',
+            relationship: '單身者魅力提升，易吸引異性注意；已婚者需注意溝通，避免因工作忙碌而忽略家庭。',
+            auspiciousDirections: '東方、東南方',
+            auspiciousColors: '綠色、藍色',
+            importantMonths: '農曆正月、五月、九月'
+        },
+        '乙': {
+            overall: '2026丙午年對乙木日主是傷官坐食神的流年，才華洋溢但需注意言行。丙火為傷官，代表才華與表達；午火為食神，代表創意與享受。',
+            career: '才華得以發揮，適合從事創意、藝術、表演等行業。但需注意職場口舌，謹言慎行，避免無意中得罪人。',
+            wealth: '財運來自才藝，有意外之財機會。但開銷也大，需注意理財規劃，避免衝動消費。',
+            health: '注意神經系統和腸胃問題，保持規律作息。夏季需防中暑與熱相關疾病。',
+            relationship: '人際關係活躍，但易有口舌是非。感情上需多些包容與理解，單身者易在社交場合遇到對象。',
+            auspiciousDirections: '東方、東南方',
+            auspiciousColors: '綠色、紅色',
+            importantMonths: '農曆二月、六月、十月'
+        },
+        '丙': {
+            overall: '2026丙午年對丙火日主是比肩坐劫財的流年，人際互動頻繁但需注意資源分配。丙火為比肩，代表人際支援；午火為劫財，代表資源分享與競爭。',
+            career: '團隊合作順暢，可藉助他人之力達成目標。但需注意職場競爭，避免與同事發生資源爭奪。',
+            wealth: '正財收入穩定，但偏財需謹慎。不宜進行合夥投資，易有財務糾紛。',
+            health: '注意心血管健康和眼睛保養，避免過度勞累。夏季火旺，需特別注意降溫。',
+            relationship: '人際關係複雜，需謹慎處理。感情上需多溝通，避免誤會產生。',
+            auspiciousDirections: '南方、東南方',
+            auspiciousColors: '紅色、紫色',
+            importantMonths: '農曆四月、八月、十二月'
+        },
+        '丁': {
+            overall: '2026丙午年對丁火日主是劫財坐比肩的流年，人際互動與資源分享並存。丙火為劫財，代表資源分享；午火為比肩，代表人際支援。',
+            career: '團隊合作順暢，可藉助他人之力達成目標。但需注意職場競爭，避免與同事發生衝突。',
+            wealth: '正財收入穩定，但偏財需謹慎。不宜進行高風險投資，理財以保守為宜。',
+            health: '注意心血管健康和睡眠品質，避免用腦過度。夏季需注意降溫防暑。',
+            relationship: '人際關係複雜，需謹慎處理。感情上需多溝通，避免誤會產生。',
+            auspiciousDirections: '南方、西南方',
+            auspiciousColors: '紅色、黃色'
+        },
+        '戊': {
+            overall: '2026丙午年對戊土日主是偏印坐正印的流年，學習成長與貴人相助並存。丙火為偏印，代表靈感與思考；午火為正印，代表貴人與學習。',
+            career: '靈感豐富，適合從事研究、策劃等工作。有貴人相助，事業發展順利。',
+            wealth: '正財收入增加，偏財運普通。適合穩健型投資，避免高風險。',
+            health: '注意腸胃問題和壓力管理，保持規律作息。夏季需注意心血管健康。',
+            relationship: '感情穩定發展，單身者易在學習場合認識對象。已婚者家庭和諧。',
+            auspiciousDirections: '中央、西南方',
+            auspiciousColors: '黃色、紅色'
+        },
+        '己': {
+            overall: '2026丙午年對己土日主是正印坐偏印的流年，貴人相助與學習成長並存。丙火為正印，代表貴人與學習；午火為偏印，代表靈感與思考。',
+            career: '有貴人相助，事業發展順利。適合進修學習，提升專業能力。',
+            wealth: '正財收入穩定，偏財運普通。適合穩健型投資，避免高風險。',
+            health: '注意腸胃問題和壓力管理，保持規律作息。夏季需注意心血管健康。',
+            relationship: '感情穩定發展，單身者易在學習場合認識對象。已婚者家庭和諧。',
+            auspiciousDirections: '中央、南方',
+            auspiciousColors: '黃色、紅色'
+        },
+        '庚': {
+            overall: '2026丙午年對庚金日主是七殺坐正官的流年，挑戰與事業發展並存。丙火為七殺，代表挑戰與壓力；午火為正官，代表事業發展。',
+            career: '職場挑戰多，但同時有晉升機會。需展現能力，適時把握機會。',
+            wealth: '正財收入增加，偏財運普通。適合穩健型投資，避免高風險。',
+            health: '注意呼吸系統和皮膚問題，保持良好作息。夏季需注意心血管健康。',
+            relationship: '感情穩定發展，單身者易在工作中認識對象。已婚者家庭和諧。',
+            auspiciousDirections: '西方、西北方',
+            auspiciousColors: '白色、金色'
+        },
+        '辛': {
+            overall: '2026丙午年對辛金日主是正官坐七殺的流年，事業發展與挑戰並存。丙火為正官，代表事業發展；午火為七殺，代表挑戰與壓力。',
+            career: '事業發展順利，有晉升機會。但需注意職場競爭，適時展現能力。',
+            wealth: '正財收入增加，偏財運普通。適合穩健型投資，避免高風險。',
+            health: '注意呼吸系統和皮膚問題，保持良好作息。夏季需注意心血管健康。',
+            relationship: '感情穩定發展，單身者易在工作中認識對象。已婚者家庭和諧。',
+            auspiciousDirections: '西方、西北方',
+            auspiciousColors: '白色、金色'
+        },
+        '壬': {
+            overall: '2026丙午年對壬水日主是偏財坐正財的流年，財運亨通。丙火為偏財，代表意外收入；午火為正財，代表穩定收入。',
+            career: '財運亨通，適合拓展業務，增加收入來源。但需注意職場競爭，適時展現能力。',
+            wealth: '偏財運佳，有意外收入機會。但需謹慎理財，避免過度消費。',
+            health: '注意泌尿系統和腎臟問題，多喝水保持良好作息。夏季需注意降溫防暑。',
+            relationship: '感情穩定發展，單身者易在社交場合認識對象。已婚者家庭和諧。',
+            auspiciousDirections: '北方、西方',
+            auspiciousColors: '黑色、藍色'
+        },
+        '癸': {
+            overall: '2026丙午年對癸水日主是正財坐偏財的流年，財運穩定增長。丙火為正財，代表穩定收入；午火為偏財，代表意外收入。',
+            career: '工作順利，適合穩定發展。有晉升機會，需適時把握。',
+            wealth: '正財收入增加，偏財運佳。適合穩健型投資，避免高風險。',
+            health: '注意泌尿系統和腎臟問題，多喝水保持良好作息。夏季需注意降溫防暑。',
+            relationship: '感情穩定發展，單身者易在社交場合認識對象。已婚者家庭和諧。',
+            auspiciousDirections: '北方、西方',
+            auspiciousColors: '黑色、藍色'
+        }
+    };
+    
+    // 切換年份顯示
+    function switchYear(year) {
+        // 更新標籤狀態
+        document.querySelectorAll('.year-tab').forEach(tab => {
+            tab.classList.remove('active');
+        });
+        
+        if (year === '2025') {
+            document.querySelector('.year-tab.blue').classList.add('active');
+        } else {
+            document.querySelector('.year-tab.green').classList.add('active');
+        }
+        
+        // 更新內容顯示
+        document.querySelectorAll('.year-content').forEach(content => {
+            content.classList.remove('active');
+        });
+        
+        document.getElementById(`year${year}Content`).classList.add('active');
+    }
+    
+    function run() {
         try {
-            const dateStr = document.getElementById('birthDate').value;
-            const hour = parseInt(document.getElementById('birthHour').value);
-            if (!dateStr) return alert("請選擇日期");
+            const dateVal = document.getElementById('myDate').value;
+            const hourVal = parseInt(document.getElementById('myHour').value);
+            if (!dateVal) {
+                alert("請選擇出生日期");
+                return;
+            }
 
-            const [y, m, d] = dateStr.split('-').map(Number);
-            
-            // 運算
-            const solar = Solar.fromYmdHms(y, m, d, hour, 0, 0);
+            const d = dateVal.split('-');
+            const solar = Solar.fromYmdHms(parseInt(d[0]), parseInt(d[1]), parseInt(d[2]), hourVal, 0, 0);
             const lunar = solar.getLunar();
-            const eb = lunar.getEightChar();
             
-            // 顯示農曆
-            document.getElementById('lunarDate').innerText = 
-                `農曆：${lunar.getYearInGanZhi()}年 ${lunar.getMonthInChinese()}月 ${lunar.getDayInChinese()}`;
+            const y = lunar.getYearInGanZhi();
+            const m = lunar.getMonthInGanZhi();
+            const d_gz = lunar.getDayInGanZhi();
+            const t = lunar.getTimeInGanZhi();
 
-            // 顯示八字排盤
-            const baziData = [
-                { label: '年柱', val: eb.getYearGan() + eb.getYearZhi() },
-                { label: '月柱', val: eb.getMonthGan() + eb.getMonthZhi() },
-                { label: '日柱', val: eb.getDayGan() + eb.getDayZhi() },
-                { label: '時柱', val: eb.getHourGan() + eb.getHourZhi() }
+            // 顯示農曆資訊
+            document.getElementById('lunarInfo').innerText = 
+                `農曆：${lunar.getYearInGanZhi()}年 ${lunar.getMonthInChinese()}月 ${lunar.getDayInChinese()}日 (${lunar.getYearShengXiao()}年)`;
+
+            // 顯示八字
+            const baziItems = [
+                { t: '年柱', v: y }, { t: '月柱', v: m },
+                { t: '日柱', v: d_gz }, { t: '時柱', v: t }
             ];
-            
-            document.getElementById('baziDisplay').innerHTML = baziData.map(item => `
+            document.getElementById('baziDisplay').innerHTML = baziItems.map(i => `
                 <div class="bazi-item">
-                    <div class="bazi-label">${item.label}</div>
-                    <div class="bazi-val">${item.val}</div>
+                    <div class="bazi-t">${i.t}</div>
+                    <div class="bazi-v">${i.v}</div>
                 </div>
             `).join('');
 
-            // 性格分析
-            const dayGan = eb.getDayGan();
-            document.getElementById('characterText').innerText = getCharAdvice(dayGan);
+            // 取得日元 (日柱的第一個字)
+            const dayGan = d_gz.substring(0, 1);
+            
+            // 顯示日元分析
+            const dayAnalysis = dayAnalysisMap[dayGan];
+            if (dayAnalysis) {
+                document.getElementById('charText').innerHTML = `
+                    <h3>${dayAnalysis.title}</h3>
+                    <p><strong>基本性格：</strong>${dayAnalysis.characteristics}</p>
+                    <p><strong>優點：</strong>${dayAnalysis.strengths}</p>
+                    <p><strong>缺點：</strong>${dayAnalysis.weaknesses}</p>
+                    <p><strong>職業建議：</strong>${dayAnalysis.careerSuggestions}</p>
+                    <p><strong>人際建議：</strong>${dayAnalysis.relationshipAdvice}</p>
+                `;
+            } else {
+                document.getElementById('charText').innerText = '日元分析資料暫缺';
+            }
 
-            // 2025 流年分析 (乙巳年)
-            document.getElementById('fortuneText').innerHTML = get2025Advice(dayGan);
+            // 顯示2025年運勢
+            const yearFortune2025 = yearlyFortune2025Map[dayGan];
+            if (yearFortune2025) {
+                document.getElementById('yearText2025').innerHTML = `
+                    <h3>2025乙巳年整體運勢</h3>
+                    <p><strong>總論：</strong>${yearFortune2025.overall}</p>
+                    <div class="fortune-grid">
+                        <div class="fortune-category">
+                            <strong>事業運：</strong><br>${yearFortune2025.career}
+                        </div>
+                        <div class="fortune-category">
+                            <strong>財富運：</strong><br>${yearFortune2025.wealth}
+                        </div>
+                        <div class="fortune-category">
+                            <strong>健康運：</strong><br>${yearFortune2025.health}
+                        </div>
+                        <div class="fortune-category">
+                            <strong>感情運：</strong><br>${yearFortune2025.relationship}
+                        </div>
+                    </div>
+                    <p><strong>吉利方位：</strong> ${yearFortune2025.auspiciousDirections}</p>
+                    <p><strong>幸運顏色：</strong> ${yearFortune2025.auspiciousColors}</p>
+                    ${yearFortune2025.importantMonths ? `<p><strong>重要月份：</strong> ${yearFortune2025.importantMonths}</p>` : ''}
+                `;
+            } else {
+                document.getElementById('yearText2025').innerHTML = `
+                    <h3>2025乙巳年整體運勢</h3>
+                    <p>${getSimpleYearFortune(dayGan, '2025')}</p>
+                `;
+            }
+            
+            // 顯示2026年運勢
+            const yearFortune2026 = yearlyFortune2026Map[dayGan];
+            if (yearFortune2026) {
+                document.getElementById('yearText2026').innerHTML = `
+                    <h3>2026丙午年整體運勢</h3>
+                    <p><strong>總論：</strong>${yearFortune2026.overall}</p>
+                    <div class="fortune-grid">
+                        <div class="fortune-category">
+                            <strong>事業運：</strong><br>${yearFortune2026.career}
+                        </div>
+                        <div class="fortune-category">
+                            <strong>財富運：</strong><br>${yearFortune2026.wealth}
+                        </div>
+                        <div class="fortune-category">
+                            <strong>健康運：</strong><br>${yearFortune2026.health}
+                        </div>
+                        <div class="fortune-category">
+                            <strong>感情運：</strong><br>${yearFortune2026.relationship}
+                        </div>
+                    </div>
+                    <p><strong>吉利方位：</strong> ${yearFortune2026.auspiciousDirections}</p>
+                    <p><strong>幸運顏色：</strong> ${yearFortune2026.auspiciousColors}</p>
+                    ${yearFortune2026.importantMonths ? `<p><strong>重要月份：</strong> ${yearFortune2026.importantMonths}</p>` : ''}
+                `;
+            } else {
+                document.getElementById('yearText2026').innerHTML = `
+                    <h3>2026丙午年整體運勢</h3>
+                    <p>${getSimpleYearFortune(dayGan, '2026')}</p>
+                `;
+            }
 
             document.getElementById('result').style.display = 'block';
-            window.scrollTo({ top: document.getElementById('result').offsetTop - 20, behavior: 'smooth' });
-
+            
+            // 滾動到結果區域
+            document.getElementById('result').scrollIntoView({ behavior: 'smooth' });
+            
         } catch (e) {
-            alert("計算過程中發生錯誤，請確保輸入正確。");
+            alert("抱歉，發生錯誤。請確認您的手機網路連線正常。");
             console.error(e);
         }
     }
-
-    function getCharAdvice(gan) {
-        const dict = {
-            '甲': '【甲木】參天大樹：為人耿直，有上進心，處事大方。但有時過於固執，不輕易低頭。',
-            '乙': '【乙木】纖柔花草：心思細膩，富有同情心，適應力強。但內心較為敏感，容易糾結。',
-            '丙': '【丙火】太陽之火：熱情開朗，行動力強，充滿正能量。缺點是性子急，容易衝動。',
-            '丁': '【丁火】燈燭之火：觀察力敏銳，重視細節，外靜內熱。但有時思慮過重，容易疲勞。',
-            '戊': '【戊土】高山大地：性格穩重，重信守義，包容力強。但稍顯保守，缺乏一些靈活性。',
-            '己': '【己土】田園泥土：多才多藝，心思縝密，懂得體貼。但有時過於內斂，不善表達。',
-            '庚': '【庚金】剛鐵刀劍：為人果斷，義氣十足，辦事乾脆。缺點是說話過於直白，易得罪人。',
-            '辛': '【辛金】珠寶玉石：追求精緻，自尊心強，腦筋轉得快。但怕受挫折，有時較虛榮。',
-            '壬': '【壬水】江河大海：聰明有智慧，大氣且不拘小節。但有時隨波逐流，定力不足。',
-            '癸': '【癸水】雨露清泉：溫柔體貼，想像力豐富。但情緒起伏大，容易被環境影響。'
+    
+    // 簡單年度運勢（備用）
+    function getSimpleYearFortune(dayGan, year) {
+        const year2025Map = {
+            '甲': '2025年劫財流年，朋友交往多，需防財物耗散。',
+            '乙': '2025年比肩流年，競爭壓力大，適合團隊合作。',
+            '丙': '2025年印星流年，有貴人相助，利於學習與進修。',
+            '丁': '2025年偏印流年，靈感豐富，但要注意身心壓力。',
+            '戊': '2025年官殺流年，職場挑戰多，是磨練意志的時期。',
+            '己': '2025年正官流年，事業有提升機會，宜守規守法。',
+            '庚': '2025年財星流年，財運機會增加，利於開展業務。',
+            '辛': '2025年偏財流年，有意外收入機會，但投資需謹慎。',
+            '壬': '2025年傷官流年，才華能發揮，但要注意職場口舌。',
+            '癸': '2025年食神流年，生活享受多，心情愉快順遂。'
         };
-        return dict[gan] || "分析載入中...";
-    }
-
-    function get2025Advice(dayGan) {
-        // 2025 是乙巳年 (乙木, 巳火)
-        const advice = {
-            '甲': '【貴人助運】乙木為劫財，今年會遇到志同道合的朋友，合作機會多。但也容易有支出，建議穩健投資。',
-            '乙': '【本命比肩】今年能量重疊，自我意識轉強。適合規劃新事業，但要注意人際溝通，避免口舌衝突。',
-            '丙': '【木火相生】乙木生丙火，今年才華能得到發揮，職場上有望獲得長輩提攜，學業與職位有晉升機會。',
-            '丁': '【印星照耀】乙木為偏印，今年學習運極佳，適合考照或鑽研專業技能。要注意心理壓力，適時放鬆。',
-            '戊': '【官運顯現】乙木剋戊土（官殺），今年事業壓力較大，但也是展現責任感的時機。注意職場紀律，勞逸結合。',
-            '己': '【財官平衡】今年在工作上有較多變動與挑戰，但巳火溫土，整體能穩定發展。建議保持耐心，必有所獲。',
-            '庚': '【財星透出】乙木為庚金之財，今年財運機會增加，適合發展斜槓或兼職。但要注意感情世界的維繫。',
-            '辛': '【偏財入命】乙木為辛金偏財，今年可能會有意想不到的小財進帳。但要注意身體健康，避免過度勞累。',
-            '壬': '【傷官生財】今年創意十足，適合從事設計、營銷類工作。說話要注意分寸，避免與主管發生爭執。',
-            '癸': '【食神入歲】乙木為癸水食神，今年生活品質提升，食祿運佳，適合享受生活或發展興趣愛好。'
+        
+        const year2026Map = {
+            '甲': '2026年食神流年，才華得以發揮，但需注意健康。',
+            '乙': '2026年傷官流年，創意豐富，但需注意職場口舌。',
+            '丙': '2026年比肩流年，人際關係活躍，適合團隊合作。',
+            '丁': '2026年劫財流年，需注意財務管理，避免不必要的開銷。',
+            '戊': '2026年偏印流年，學習運佳，適合進修深造。',
+            '己': '2026年正印流年，貴人運強，事業發展順利。',
+            '庚': '2026年七殺流年，挑戰多但機會也多，需把握時機。',
+            '辛': '2026年正官流年，事業發展順利，有晉升機會。',
+            '壬': '2026年偏財流年，財運亨通，有意外收入機會。',
+            '癸': '2026年正財流年，財運穩定增長，適合穩健投資。'
         };
-        return advice[dayGan] || "運勢計算中...";
+        
+        if (year === '2025') {
+            return year2025Map[dayGan] || '2025年運勢計算中...';
+        } else {
+            return year2026Map[dayGan] || '2026年運勢計算中...';
+        }
     }
 </script>
 
