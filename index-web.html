@@ -66,6 +66,18 @@
         }
 
         #copyTip { transition: opacity 0.3s; opacity: 0; pointer-events: none; }
+        
+        /* 今日日期的淺藍色背景 */
+        .today-bg {
+            background-color: #e0f2fe !important; /* 淺藍色背景 */
+            border: 0.5px solid #bae6fd !important; /* 淺藍色邊框 */
+        }
+        
+        /* 今日日期如果是假日，覆蓋背景色為紅色 */
+        .today-bg.holiday {
+            background-color: #dc2626 !important; /* 紅色背景 */
+            color: white !important; /* 白色文字 */
+        }
     </style>
 </head>
 <body class="p-4">
@@ -119,18 +131,19 @@
         '谢土': '謝土', '启钻': '啟鑽', '安机械': '安機械','造桥':'造橋',
         '诸事不宜': '諸事不宜', '诸事无忌': '諸事無忌', '嫁娶': '嫁娶', '祭祀': '祭祀', '祈福': '祈福', '斋醮': '齋醮',
         '動土': '動土', '移徙': '移徙', '入宅': '入宅', '修造': '修造', '安葬': '安葬', '立碑': '立碑', '修坟': '修墳',
-        '成服': '成服', '除服': '除服', '纳采': '納採', '订盟': '訂盟', '纳婿': '納婿', '安床': '安床', '开光': '開光',
+        '成服': '成服', '除服': '除服', '纳采': '納彩', '订盟': '訂盟', '纳婿': '納婿', '安床': '安床', '开光': '開光',
         '经络': '經絡', '解除': '解除', '竖柱': '豎柱', '上梁': '上樑', '盖屋': '蓋屋', '纳財': '納財', '开市': '開市',
         '交易': '交易', '立券': '立券', '挂匾': '掛匾', '出行': '出行', '理发': '理髮', '安门': '安門', '修饰垣墙': '修飾垣牆',
         '造畜稠': '造畜稠', '作灶': '作灶', '放水': '放水', '掘井': '掘井', '开池': '開池', '开厕': '開廁', '破土': '破土',
         '启攒': '啟攢', '扫舍': '掃舍', '平治道涂': '平治道塗', '馀事勿取': '餘事勿取', '求嗣': '求嗣', '伐木': '伐木',
         '畋猎': '畋獵', '捕捉': '捕捉', '结网': '結網', '取渔': '取漁', '教牛马': '教牛馬', '开生坟': '開生墳',
-        '惊蛰': '驚蟄', '小满': '小滿', '芒种': '芒種', '处暑': '處暑', '白露': '白露', '寒露': '寒露', '霜降': '霜降','开仓': '開倉','出货财': '出貨財','腊月': '臘月','纳财': '納財',
+        '惊蛰': '驚蟄', '小满': '小滿', '芒种': '芒種', '处暑': '處暑', '白露': '白露', '寒露': '寒露', '霜降': '霜降','开仓': '開倉','出货财': '出貨財','腊月': '臘月','纳财': '納財','进人口': '進人口','动土': '動土',
         '龙': '龍', '马': '馬', '鸡': '雞', '猪': '豬', '属': '屬',
         '冲': '沖', '煞': '煞', '东': '東', '西': '西', '南': '南', '北': '北', '正东': '正東', '正西': '正西', '正南': '正南', '正北': '正北',
         '炉中火': '爐中火', '剑锋金': '劍鋒金', '山头火': '山頭火', '涧下水': '澗下水', '城头土': '城頭土', '白蜡金': '白蠟金', '杨柳木': '楊柳木', '泉中水': '泉中水', '屋上土': '屋上土', '霹雳火': '霹靂火', '松柏木': '松柏木', '长流水': '長流水', '沙中金': '沙中金', '山下火': '山下火', '平地木': '平地木', '壁上土': '壁上土', '金箔金': '金箔金', '佛灯火': '佛燈火', '天河水': '天河水', '驿马': '驛馬',
         '春节': '春節', '元宵节': '元宵節', '端午节': '端午節', '七夕节': '七夕節', '中秋节': '中秋節', '重阳节': '重陽節', '除夕': '除夕'
     };
+
     function toTraditional(text) {
         if (!text) return "";
         if (Array.isArray(text)) return text.map(item => toTraditional(item));
@@ -252,10 +265,29 @@
             const holiday = isNewHoliday(solar, lunar);
             const isHoliday = holiday !== null || weekDay === 0 || weekDay === 6;
             const isToday = new Date().toDateString() === dateObj.toDateString();
+            
+            // 動態構建CSS類別
+            let dayClass = "day-box flex flex-col items-center justify-center ";
+            
+            if (isToday) {
+                // 今天日期使用淺藍色背景
+                dayClass += "today-bg ";
+                if (isHoliday) {
+                    dayClass += "holiday text-white ";
+                } else {
+                    dayClass += "text-gray-800 ";
+                }
+            } else if (isHoliday) {
+                // 假日使用紅色背景
+                dayClass += "bg-red-600 text-white ";
+            } else {
+                // 普通日期
+                dayClass += "bg-white text-gray-800 ";
+            }
 
             const dayHtml = `
                 <div onclick="showDetail(${year}, ${month}, ${d}, this)" 
-                     class="day-box flex flex-col items-center justify-center ${isHoliday ? 'bg-red-600 text-white' : 'bg-white text-gray-800'} ${isToday ? 'ring-2 ring-inset ring-black' : ''}">
+                     class="${dayClass.trim()}">
                     <div class="text-3xl font-light serif leading-none">${d}</div>
                     <div class="absolute bottom-1 right-1 text-[8px] flex flex-col items-end leading-tight">
                         <span class="${isHoliday ? 'text-white' : 'text-gray-400'}">${toTraditional(lunar.getDayInChinese())}</span>
