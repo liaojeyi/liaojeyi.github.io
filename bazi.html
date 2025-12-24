@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>專業八字命盤分析</title>
     <script src="https://cdn.jsdelivr.net/npm/lunar-javascript/lunar.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         body { 
             font-family: -apple-system, sans-serif; 
@@ -16,7 +17,7 @@
             min-height: 100vh;
         }
         .card { 
-            max-width: 480px; 
+            max-width: 500px; 
             margin: 0 auto; 
             background: #fff; 
             border-radius: 16px; 
@@ -123,9 +124,6 @@
             border-radius: 0 10px 10px 0;
             transition: transform 0.3s;
         }
-        .desc-box:hover {
-            transform: translateX(5px);
-        }
         .blue-border { 
             border-left-color: #2980b9; 
             background: linear-gradient(to right, #f0f7ff, #e3f2fd); 
@@ -133,6 +131,14 @@
         .green-border { 
             border-left-color: #27ae60; 
             background: linear-gradient(to right, #f0fff4, #e8f5e9); 
+        }
+        .purple-border { 
+            border-left-color: #8e44ad; 
+            background: linear-gradient(to right, #f5eef8, #e8daef); 
+        }
+        .orange-border { 
+            border-left-color: #e67e22; 
+            background: linear-gradient(to right, #fef5e7, #fdebd0); 
         }
         
         .fortune-grid {
@@ -169,11 +175,20 @@
             border-bottom-color: #a3e4d7;
         }
         
+        .purple-border h3 {
+            color: #8e44ad;
+            border-bottom-color: #d2b4de;
+        }
+        
+        .orange-border h3 {
+            color: #e67e22;
+            border-bottom-color: #f5b041;
+        }
+        
         .loading {
             text-align: center;
             padding: 25px;
             color: #666;
-            font-style: italic;
         }
         
         .year-tabs {
@@ -193,6 +208,7 @@
             transition: all 0.3s;
             border-radius: 8px 8px 0 0;
             margin-right: 5px;
+            color: #555;
         }
         
         .year-tab.active {
@@ -202,18 +218,22 @@
         
         .year-tab.blue {
             background: #f0f7ff;
+            color: #2980b9;
         }
         
         .year-tab.blue.active {
             background: #2980b9;
+            color: white;
         }
         
         .year-tab.green {
             background: #f0fff4;
+            color: #27ae60;
         }
         
         .year-tab.green.active {
             background: #27ae60;
+            color: white;
         }
         
         .year-content {
@@ -222,6 +242,76 @@
         
         .year-content.active {
             display: block;
+        }
+        
+        .wuxing-chart-container {
+            margin: 15px 0;
+            padding: 10px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        
+        .wuxing-stats {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 8px;
+            margin-top: 15px;
+        }
+        
+        .wuxing-item {
+            text-align: center;
+            padding: 8px;
+            border-radius: 6px;
+            font-weight: bold;
+            color: white;
+            text-shadow: 1px 1px 1px rgba(0,0,0,0.2);
+        }
+        
+        .metal { background: linear-gradient(to bottom, #95a5a6, #7f8c8d); }
+        .wood { background: linear-gradient(to bottom, #27ae60, #229954); }
+        .water { background: linear-gradient(to bottom, #3498db, #2980b9); }
+        .fire { background: linear-gradient(to bottom, #e74c3c, #c0392b); }
+        .earth { background: linear-gradient(to bottom, #e67e22, #d35400); }
+        
+        .xishen-box {
+            background: #fffde7;
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 15px;
+            border: 1px solid #fdcb6e;
+        }
+        
+        .bone-weight-box {
+            text-align: center;
+            padding: 15px;
+            background: linear-gradient(135deg, #8e44ad, #9b59b6);
+            color: white;
+            border-radius: 10px;
+            margin: 15px 0;
+            box-shadow: 0 4px 8px rgba(142, 68, 173, 0.3);
+        }
+        
+        .bone-weight-value {
+            font-size: 36px;
+            font-weight: bold;
+            margin: 10px 0;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .bone-weight-title {
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+        
+        .bone-song-box {
+            background: #f5eef8;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            border-left: 4px solid #8e44ad;
+            font-style: italic;
+            line-height: 1.8;
         }
         
         @media (max-width: 480px) {
@@ -233,6 +323,9 @@
             }
             .bazi-v {
                 font-size: 20px;
+            }
+            .wuxing-stats {
+                grid-template-columns: repeat(3, 1fr);
             }
         }
         
@@ -278,6 +371,16 @@
                 <div id="charText" class="loading">分析中...</div>
             </div>
 
+            <div class="desc-box purple-border">
+                <b style="color:#8e44ad; font-size:18px;">【八字五行比例與喜用神】</b><br>
+                <div id="wuxingText" class="loading">分析中...</div>
+            </div>
+
+            <div class="desc-box orange-border">
+                <b style="color:#e67e22; font-size:18px;">【袁天罡稱骨算命】</b><br>
+                <div id="boneWeightText" class="loading">計算中...</div>
+            </div>
+
             <div class="year-tabs">
                 <button class="year-tab blue active" onclick="switchYear('2025')">2025乙巳年</button>
                 <button class="year-tab green" onclick="switchYear('2026')">2026丙午年</button>
@@ -296,7 +399,7 @@
             </div>
             
             <div class="tip-box">
-                💡 提示：點擊上方年份標籤可切換不同年份的運勢分析。運勢分析僅供參考，命運掌握在自己手中。
+                💡 提示：八字分析與稱骨算命僅供參考，命運掌握在自己手中。喜用神分析可作為調和命理、改善運勢的參考方向。
             </div>
         </div>
     </div>
@@ -581,6 +684,145 @@
         }
     };
     
+    // 五行對照表
+    const wuxingMap = {
+        // 天干
+        '甲': '木', '乙': '木',
+        '丙': '火', '丁': '火',
+        '戊': '土', '己': '土',
+        '庚': '金', '辛': '金',
+        '壬': '水', '癸': '水',
+        // 地支
+        '子': '水', '亥': '水',
+        '寅': '木', '卯': '木',
+        '巳': '火', '午': '火',
+        '申': '金', '酉': '金',
+        '辰': '土', '戌': '土', '丑': '土', '未': '土'
+    };
+    
+    // 喜用神分析資料
+    const xishenMap = {
+        '木': {
+            strong: '木旺，喜用神為金、火、土。可多用白色、金色、紅色、紫色、黃色。',
+            weak: '木弱，喜用神為水、木。可多用黑色、藍色、綠色。',
+            neutral: '木中和，喜用神為水、木。可多用黑色、藍色、綠色。'
+        },
+        '火': {
+            strong: '火旺，喜用神為水、金、土。可多用黑色、藍色、白色、金色、黃色。',
+            weak: '火弱，喜用神為木、火。可多用綠色、紅色、紫色。',
+            neutral: '火中和，喜用神為木、火。可多用綠色、紅色、紫色。'
+        },
+        '土': {
+            strong: '土旺，喜用神為木、金、水。可多用綠色、白色、金色、黑色、藍色。',
+            weak: '土弱，喜用神為火、土。可多用紅色、紫色、黃色。',
+            neutral: '土中和，喜用神為火、土。可多用紅色、紫色、黃色。'
+        },
+        '金': {
+            strong: '金旺，喜用神為火、木、水。可多用紅色、紫色、綠色、黑色、藍色。',
+            weak: '金弱，喜用神為土、金。可多用黃色、白色、金色。',
+            neutral: '金中和，喜用神為土、金。可多用黃色、白色、金色。'
+        },
+        '水': {
+            strong: '水旺，喜用神為土、火、木。可多用黃色、紅色、紫色、綠色。',
+            weak: '水弱，喜用神為金、水。可多用白色、金色、黑色、藍色。',
+            neutral: '水中和，喜用神為金、水。可多用白色、金色、黑色、藍色。'
+        }
+    };
+    
+    // 袁天罡稱骨算命資料
+    // 年骨重對照表（簡化版，以60甲子為基礎）
+    const yearBoneWeight = {
+        '甲子': 1.2, '乙丑': 0.9, '丙寅': 0.6, '丁卯': 0.7, '戊辰': 1.2,
+        '己巳': 0.5, '庚午': 0.9, '辛未': 0.8, '壬申': 0.7, '癸酉': 0.8,
+        '甲戌': 1.5, '乙亥': 0.9, '丙子': 1.6, '丁丑': 0.8, '戊寅': 0.8,
+        '己卯': 1.9, '庚辰': 1.2, '辛巳': 0.6, '壬午': 0.8, '癸未': 0.7,
+        '甲申': 0.5, '乙酉': 1.5, '丙戌': 0.6, '丁亥': 1.6, '戊子': 1.5,
+        '己丑': 0.7, '庚寅': 0.9, '辛卯': 1.2, '壬辰': 1.0, '癸巳': 0.7,
+        '甲午': 1.5, '乙未': 0.6, '丙申': 0.5, '丁酉': 1.4, '戊戌': 1.4,
+        '己亥': 0.9, '庚子': 0.7, '辛丑': 0.7, '壬寅': 0.9, '癸卯': 1.2,
+        '甲辰': 0.8, '乙巳': 0.7, '丙午': 1.3, '丁未': 0.5, '戊申': 1.4,
+        '己酉': 0.5, '庚戌': 0.9, '辛亥': 1.7, '壬子': 0.5, '癸丑': 0.7,
+        '甲寅': 1.2, '乙卯': 0.8, '丙辰': 0.8, '丁巳': 0.6, '戊午': 1.9,
+        '己未': 0.6, '庚申': 0.8, '辛酉': 1.6, '壬戌': 1.0, '癸亥': 0.7
+    };
+    
+    // 月骨重對照表（農曆月份）
+    const monthBoneWeight = {
+        1: 0.6, 2: 0.7, 3: 1.8, 4: 0.9, 5: 0.5, 6: 1.6,
+        7: 0.9, 8: 1.5, 9: 1.8, 10: 0.8, 11: 0.9, 12: 0.5
+    };
+    
+    // 日骨重對照表（農曆日期）
+    const dayBoneWeight = {
+        1: 0.5, 2: 1.0, 3: 0.8, 4: 1.5, 5: 1.6, 6: 1.5,
+        7: 0.8, 8: 1.6, 9: 0.8, 10: 1.6, 11: 0.9, 12: 1.7,
+        13: 0.8, 14: 1.7, 15: 1.0, 16: 0.8, 17: 0.9, 18: 1.8,
+        19: 0.5, 20: 1.5, 21: 1.0, 22: 0.9, 23: 0.8, 24: 0.9,
+        25: 1.5, 26: 1.8, 27: 0.7, 28: 0.8, 29: 1.6, 30: 0.6
+    };
+    
+    // 時辰骨重對照表
+    const hourBoneWeight = {
+        0: 1.6, 1: 0.6, 3: 0.7, 5: 1.0, 7: 0.9, 9: 1.6,
+        11: 1.0, 13: 0.8, 15: 0.8, 17: 0.9, 19: 0.6, 21: 0.6,
+        23: 1.6
+    };
+    
+    // 稱骨歌對照表
+    const boneSongMap = {
+        2.1: "短命非業謂大空，平生災難事重重，<p></p>凶禍頻臨陷逆境，終世困苦事不成。",
+        2.2: "身寒骨冷苦伶仃，此命推來行乞人，<p></p>勞勞碌碌無度日，終年打拱過平生。",
+        2.3: "此命推來骨格輕，求謀作事事難成，<p></p>妻兒兄弟應難許，別處他鄉作散人。",
+        2.4: "此命推來福祿無，門庭困苦總難榮，<p></p>六親骨肉皆無靠，流浪他鄉作老翁。",
+        2.5: "此命推來祖業微，門庭營度似稀奇，<p></p>六親骨肉如冰炭，一世勤勞自把持。",
+        2.6: "平生衣祿苦中求，獨自營謀事不休，<p></p>離祖出門宜早計，晚來衣祿自無休。",
+        2.7: "一生作事少商量，難靠祖宗作主張，<p></p>獨馬單槍空做去，早年晚歲總無長。",
+        2.8: "一生行事似飄蓬，祖宗產業在夢中，<p></p>若不過房改名姓，也當移徒二三通。",
+        2.9: "初年運限未曾亨，縱有功名在後成，<p></p>須過四旬才可立，移居改姓始為良。",
+        3.0: "勞勞碌碌苦中求，東奔西走何日休，<p></p>若使終身勤與儉，老來稍可免憂愁。",
+        3.1: "忙忙碌碌苦中求，何日雲開見日頭，<p></p>難得祖基家可立，中年衣食漸無憂。",
+        3.2: "初年運蹇事難謀，漸有財源如水流，<p></p>到得中年衣食旺，那時名利一齊收。",
+        3.3: "早年做事事難成，百年勤勞枉費心，<p></p>半世自如流水去，後來運到始得金。",
+        3.4: "此命福氣果如何，僧道門中衣祿多，<p></p>離祖出家方為妙，朝晚拜佛念彌陀。",
+        3.5: "生平福量不周全，祖業根基覺少傳，<p></p>營事生涯宜守舊，時來衣食勝從前。",
+        3.6: "不須勞碌過平生，獨自成家福不輕，<p></p>早有福星常照命，任君行去百般成。",
+        3.7: "此命般般事不成，弟兄少力自孤行，<p></p>雖然祖業須微有，來得明時去不明。",
+        3.8: "一身骨肉最清高，早入簧門姓氏標，<p></p>待到年將三十六，藍衫脫去換紅袍。",
+        3.9: "此命終身運不通，勞勞作事盡皆空，<p></p>苦心竭力成家計，到得那時在夢中。",
+        4.0: "平生衣祿是綿長，件件心中自主張，<p></p>前面風霜多受過，後來必定享安康。",
+        4.1: "此命推來事不同，為人能幹異凡庸，<p></p>中年還有逍遙福，不比前時運未通。",
+        4.2: "得寬懷處且寬懷，何用雙眉皺不開，<p></p>若使中年命運濟，那時名利一齊來。",
+        4.3: "為人心性最聰明，作事軒昂近貴人，<p></p>衣祿一生天數定，不須勞碌是豐亨。",
+        4.4: "萬事由天莫苦求，須知福祿命裡收，<p></p>少壯名利難如意，晚景欣然更不憂。",
+        4.5: "名利推來竟若何，前番辛苦後奔波，<p></p>命中難養男與女，骨肉扶持也不多。",
+        4.6: "東西南北盡皆通，出姓移名更覺隆，<p></p>衣祿無虧天數定，中年晚景一般同。",
+        4.7: "此命推來旺末年，妻榮子貴自怡然，<p></p>平生原有滔滔福，可有財源如水流。",
+        4.8: "初年運道未曾亨，若是蹉跎再不興，<p></p>兄弟六親皆無靠，一身事業晚年成。",
+        4.9: "此命推來福不輕，自成自立顯門庭，<p></p>從來富貴人親近，使婢差奴過一生。",
+        5.0: "為利為名終日勞，中年福祿也多遭，<p></p>老來是有財星照，不比前番目下高。",
+        5.1: "一世榮華事事通，不須勞碌自亨通，<p></p>兄弟叔姪皆如意，家業成時福祿宏。",
+        5.2: "一世亨通事事能，不須勞苦自然寧，<p></p>宗族有光欣喜甚，家產豐盈自稱心。",
+        5.3: "此格推來氣象真，興家發達在其中，<p></p>一生福祿安排定，卻是人間一富翁。",
+        5.4: "此命推來厚且清，詩書滿腹看功成，<p></p>豐衣足食自然穩，正是人間有福人。",
+        5.5: "走馬揚鞭爭利名，少年作事費籌論，<p></p>一朝福祿源源至，富貴榮華顯六親。",
+        5.6: "此格推來禮義通，一生福祿用無窮，<p></p>甜酸苦辣皆嘗過，財源滾滾穩且豐。",
+        5.7: "福祿豐盈萬事全，一生榮耀顯雙親，<p></p>名揚威振人欽敬，處世逍遙似遇春。",
+        5.8: "平生福祿自然來，名利兼全福壽偕，<p></p>雁塔題名為貴客，紫袍金帶走金階。",
+        5.9: "細推此格妙且清，必定才高禮義通，<p></p>甲第之中應有分，揚鞭走馬顯威榮。",
+        6.0: "一朝金榜快題名，顯祖榮宗立大功，<p></p>衣祿定然原裕足，田園財帛更豐盈。",
+        6.1: "不作朝中金榜客，定為世上大財翁，<p></p>聰明天賦經書熟，名顯高科自是榮。",
+        6.2: "此命生來福不窮，讀書必定顯親宗，<p></p>紫衣金帶為卿相，富貴榮華皆可同。",
+        6.3: "命主為官福祿長，得來富貴實非常，<p></p>名題雁塔傳金榜，定中高科天下揚。",
+        6.4: "此格威權不可當，紫袍金帶坐高堂，<p></p>榮華富貴誰能及，積玉堆金滿儲倉。",
+        6.5: "細推此命福不輕，安國安邦極品人，<p></p>文繡雕梁政富貴，威聲照耀四方聞。",
+        6.6: "此格人間一福人，堆金積玉滿堂春，<p></p>從來富貴由天定，正笏垂紳謁聖君。",
+        6.7: "此命生來福自宏，田園家業最高隆，<p></p>平生衣祿豐盈足，一世榮華萬事通。",
+        6.8: "富貴由天莫苦求，萬金家計不須謀，<p></p>十年不比前番事，祖業根基水上舟。",
+        6.9: "君是人間衣祿星，一生福貴眾人欽，<p></p>縱然福祿由天定，安享榮華過一生。",
+        7.0: "此命推來福不輕，不須愁慮苦勞心，<p></p>一生天定衣與祿，富貴榮華主一生。",
+        7.1: "此命生來大不同，公侯卿相在其中，<p></p>一生自有逍遙福，富貴榮華極品隆。"
+    };
+    
     // 切換年份顯示
     function switchYear(year) {
         // 更新標籤狀態
@@ -600,6 +842,98 @@
         });
         
         document.getElementById(`year${year}Content`).classList.add('active');
+    }
+    
+    // 計算八字五行比例
+    function calculateWuxing(bazi) {
+        const wuxingCount = {
+            '金': 0, '木': 0, '水': 0, '火': 0, '土': 0
+        };
+        
+        // 分析八字四柱的五行
+        bazi.forEach(pillar => {
+            const gan = pillar.substring(0, 1);
+            const zhi = pillar.substring(1, 2);
+            
+            // 天干五行
+            if (wuxingMap[gan]) {
+                wuxingCount[wuxingMap[gan]]++;
+            }
+            
+            // 地支五行
+            if (wuxingMap[zhi]) {
+                wuxingCount[wuxingMap[zhi]]++;
+            }
+        });
+        
+        return wuxingCount;
+    }
+    
+    // 判斷喜用神
+    function determineXishen(dayGan, wuxingCount) {
+        const dayElement = wuxingMap[dayGan];
+        const total = Object.values(wuxingCount).reduce((a, b) => a + b, 0);
+        const dayElementCount = wuxingCount[dayElement] || 0;
+        
+        let strength = 'neutral';
+        if (total > 0) {
+            const percentage = (dayElementCount / total) * 100;
+            if (percentage > 30) {
+                strength = 'strong';
+            } else if (percentage < 15) {
+                strength = 'weak';
+            }
+        }
+        
+        return xishenMap[dayElement][strength];
+    }
+    
+    // 計算稱骨算命
+    function calculateBoneWeight(lunar, hourVal) {
+        const yearGanZhi = lunar.getYearInGanZhi();
+        const month = lunar.getMonth();
+        const day = lunar.getDay();
+        
+        // 獲取年骨重
+        const yearWeight = yearBoneWeight[yearGanZhi] || 1.0;
+        
+        // 獲取月骨重
+        const monthWeight = monthBoneWeight[month] || 1.0;
+        
+        // 獲取日骨重
+        const dayWeight = dayBoneWeight[day] || 1.0;
+        
+        // 獲取時辰骨重
+        let hourWeight = 1.0;
+        for (const key in hourBoneWeight) {
+            if (hourVal >= parseInt(key)) {
+                hourWeight = hourBoneWeight[key];
+            }
+        }
+        
+        // 計算總骨重
+        const totalWeight = yearWeight + monthWeight + dayWeight + hourWeight;
+        
+        return {
+            yearWeight,
+            monthWeight,
+            dayWeight,
+            hourWeight,
+            totalWeight: parseFloat(totalWeight.toFixed(1))
+        };
+    }
+    
+    // 獲取稱骨歌
+    function getBoneSong(totalWeight) {
+        // 四捨五入到小數點後一位
+        const roundedWeight = Math.round(totalWeight * 10) / 10;
+        
+        // 尋找最接近的稱骨歌
+        let closestKey = Object.keys(boneSongMap).reduce((prev, curr) => {
+            return Math.abs(curr - roundedWeight) < Math.abs(prev - roundedWeight) ? curr : prev;
+        });
+        
+        return boneSongMap[closestKey] || "此命推來福自宏，田園家業最高隆，平生衣祿豐盈足，一世榮華萬事通。";
     }
     
     function run() {
@@ -653,6 +987,52 @@
             } else {
                 document.getElementById('charText').innerText = '日元分析資料暫缺';
             }
+
+            // 計算五行比例與喜用神
+            const baziArray = [y, m, d_gz, t];
+            const wuxingCount = calculateWuxing(baziArray);
+            const xishenAdvice = determineXishen(dayGan, wuxingCount);
+            
+            // 計算五行比例百分比
+            const total = Object.values(wuxingCount).reduce((a, b) => a + b, 0);
+            const wuxingPercentages = {};
+            Object.keys(wuxingCount).forEach(element => {
+                wuxingPercentages[element] = total > 0 ? Math.round((wuxingCount[element] / total) * 100) : 0;
+            });
+            
+            // 顯示五行比例與喜用神
+            document.getElementById('wuxingText').innerHTML = `
+                <h3>八字五行比例</h3>
+                <div class="wuxing-stats">
+                    <div class="wuxing-item metal">金: ${wuxingCount['金']} (${wuxingPercentages['金']}%)</div>
+                    <div class="wuxing-item wood">木: ${wuxingCount['木']} (${wuxingPercentages['木']}%)</div>
+                    <div class="wuxing-item water">水: ${wuxingCount['水']} (${wuxingPercentages['水']}%)</div>
+                    <div class="wuxing-item fire">火: ${wuxingCount['火']} (${wuxingPercentages['火']}%)</div>
+                    <div class="wuxing-item earth">土: ${wuxingCount['土']} (${wuxingPercentages['土']}%)</div>
+                </div>
+                <div class="xishen-box">
+                    <p><strong>喜用神分析：</strong>${xishenAdvice}</p>
+                    <p><strong>日主五行：</strong>${wuxingMap[dayGan]} (${dayGan})</p>
+                    <p><strong>五行平衡建議：</strong>根據八字五行比例，建議在生活中多使用喜用神相關的元素、顏色和方位，以達到五行平衡，改善運勢。</p>
+                </div>
+            `;
+
+            // 計算稱骨算命
+            const boneWeight = calculateBoneWeight(lunar, hourVal);
+            const boneSong = getBoneSong(boneWeight.totalWeight);
+            
+            // 顯示稱骨算命結果
+            document.getElementById('boneWeightText').innerHTML = `
+                <div class="bone-weight-box">
+                    <div class="bone-weight-title">您的命骨總重</div>
+                    <div class="bone-weight-value">${boneWeight.totalWeight} 兩</div>
+                    <div>年骨重: ${boneWeight.yearWeight}兩 |月骨重: ${boneWeight.monthWeight}兩 <p></p>日骨重: ${boneWeight.dayWeight}兩 |時骨重: ${boneWeight.hourWeight}兩</div>
+                </div>
+                <div class="bone-song-box">
+                    <h3>稱骨歌</h3>
+                    <p>${boneSong}</p>
+                </div>
+            `;
 
             // 顯示2025年運勢
             const yearFortune2025 = yearlyFortune2025Map[dayGan];
