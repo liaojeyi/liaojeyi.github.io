@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>繁體農民曆 - 國慶假日修正版</title>
+    <title>繁體農民曆 - 快速查詢版</title>
     
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -50,10 +50,11 @@
         .active-day { border: 2.5px solid #1a1a1a !important; z-index: 20; }
         
         .festival-tag {
-            background-color: #a62c2b; color: white; padding: 2px 10px; font-size: 0.75rem;
-            letter-spacing: 0.1em; display: inline-block; margin-bottom: 0.5rem; border-radius: 4px;
+            background-color: #a62c2b; color: white; padding: 2px 8px; font-size: 0.7rem;
+            letter-spacing: 0.1em; display: inline-block; margin-bottom: 0.5rem;
         }
 
+        /* 隱藏原生下拉選單箭頭，改用更簡潔的樣式 */
         select {
             appearance: none;
             background: transparent;
@@ -76,8 +77,9 @@
             <button onclick="goToday()" class="bg-black text-white px-5 py-1.5 rounded-full text-xs font-bold active:opacity-70">今日</button>
         </div>
         
-        <div class="flex items-center justify-between bg-gray-100 rounded-xl p-1 shadow-inner">
+        <div class="flex items-center justify-between bg-gray-100 rounded-xl p-1">
             <button onclick="changeMonth(-1)" class="w-12 h-10 flex items-center justify-center font-bold text-gray-400">〈</button>
+            
             <div class="flex items-center space-x-1 text-lg">
                 <select id="yearSelect" onchange="onPickerChange()"></select>
                 <span class="text-gray-400 font-light">年</span>
@@ -89,6 +91,7 @@
                 </select>
                 <span class="text-gray-400 font-light">月</span>
             </div>
+            
             <button onclick="changeMonth(1)" class="w-12 h-10 flex items-center justify-center font-bold text-gray-400">〉</button>
         </div>
     </header>
@@ -98,101 +101,135 @@
             <div class="calendar-grid text-center text-xs font-bold text-gray-400 mb-2 tracking-widest">
                 <div class="text-red-500 py-2">日</div><div>一</div><div>二</div><div>三</div><div>四</div><div>五</div><div class="text-red-500 py-2">六</div>
             </div>
-            <div id="calendarDays" class="calendar-grid rounded-2xl overflow-hidden border border-gray-100 shadow-sm bg-gray-200"></div>
+            <div id="calendarDays" class="calendar-grid rounded-2xl overflow-hidden border border-gray-100 shadow-sm"></div>
         </div>
 
         <div class="relative">
-            <div id="detailPanel" class="bg-white p-6 rounded-3xl border border-gray-100 shadow-xl relative overflow-hidden min-h-[500px]"></div>
+            <div id="detailPanel" class="bg-white p-6 rounded-3xl border border-gray-100 shadow-xl relative overflow-hidden min-h-[450px]"></div>
             <div id="copyTip" class="absolute top-4 right-4 bg-stone-800 text-white text-[10px] px-2 py-1 rounded z-50">已複製</div>
         </div>
     </div>
 </div>
 
 <script>
-    // --- 國定假日判定邏輯 ---
-    function getTWOHoliday(solar, lunar) {
-        const sm = solar.getMonth(); // 1-12
-        const sd = solar.getDay();
-        const lm = lunar.getMonth(); // 1-12
-        const ld = lunar.getDay();
-        const year = solar.getYear();
-
-        // 陽曆固定假日
-        if (sm === 1 && sd === 1) return "元旦";
-        if (sm === 2 && sd === 28) return "和平紀念日";
-        if (sm === 4 && sd === 4) return "兒童節";
-        if (sm === 5 && sd === 1) return "勞動節";
-        if (sm === 9 && sd === 28) return "教師節";
-        if (sm === 10 && sd === 10) return "國慶日";
-        
-        // 2025年起新增假日
-        if (year >= 2025) {
-            if (sm === 10 && sd === 25) return "臺灣光復節";
-            if (sm === 12 && sd === 25) return "行憲紀念日";
-        }
-
-        // 農曆固定假日
-        if (lm === 1 && ld === 1) return "春節";
-        if (lm === 1 && ld === 2) return "春節";
-        if (lm === 1 && ld === 3) return "春節";
-        if (lm === 5 && ld === 5) return "端午節";
-        if (lm === 8 && ld === 15) return "中秋節";
-
-        // 除夕判定 (農曆最後一天)
-        const nextDayLunar = lunar.getNextDay();
-        if (nextDayLunar.getMonth() === 1 && nextDayLunar.getDay() === 1) return "除夕";
-
-        // 清明節 (節氣判定)
-        if (lunar.getJieQi() === "清明") return "民族掃墓節";
-
-        return null;
-    }
-
     const s2t_map = {
         '造庙': '造廟', '归宁': '歸寧', '入学': '入學', '坏垣': '壞垣', '求医': '求醫', '会亲友': '會親友', 
         '问名': '問名', '纳畜': '納畜', '牧养': '牧養', '补垣': '補垣', '开柱眼': '開柱眼', '断蚁': '斷蟻',
-        '塑绘': '塑繪', '行丧': '行喪', '词讼': '詞訟', '置产': '置產', '入殓': '入殮', '開渠': '開渠', 
-        '谢土': '謝土', '启钻': '啟鑽', '安机械': '安機械','造桥':'造橋', '诸事不宜': '諸事不宜', '诸事无忌': '諸事無忌', 
-        '嫁娶': '嫁娶', '祭祀': '祭祀', '祈福': '祈福', '齋醮': '齋醮', '動土': '動土', '移徙': '移徙', '入宅': '入宅', 
-        '修造': '修造', '安葬': '安葬', '立碑': '立碑', '修坟': '修墳', '成服': '成服', '除服': '除服', '納採': '納採', 
-        '訂盟': '訂盟', '纳婿': '納婿', '安床': '安床', '開光': '開光', '經絡': '經絡', '解除': '解除', '豎柱': '豎柱', 
-        '上梁': '上樑', '蓋屋': '蓋屋', '納財': '納財', '開市': '開市', '交易': '交易', '立券': '立券', '掛匾': '掛匾', 
-        '出行': '出行', '理髮': '理髮', '安門': '安門', '修飾垣牆': '修飾垣牆', '造畜稠': '造畜稠', '作灶': '作灶', 
-        '放水': '放水', '掘井': '掘井', '開池': '開池', '開廁': '開廁', '破土': '破土', '啟攢': '啟攢', '掃舍': '掃舍', 
-        '平治道塗': '平治道塗', '餘事勿取': '餘事勿取', '求嗣': '求嗣', '伐木': '伐木', '畋獵': '畋獵', '捕捉': '捕捉', 
-        '結網': '結網', '取漁': '取漁', '教牛馬': '教牛馬', '開生墳': '開生墳', '驚蟄': '驚蟄', '小滿': '小滿', '芒種': '芒種', 
-        '處暑': '處暑', '白露': '白露', '寒露': '寒露', '霜降': '霜降', '開倉': '開倉', '出貨財': '出貨財', '臘月': '臘月',
-        '沖': '沖', '煞': '煞', '東': '東', '西': '西', '南': '南', '北': '北', '正東': '正東', '正西': '正西', '正南': '正南', '正北': '正北',
-        '龍': '龍', '馬': '馬', '雞': '雞', '豬': '豬', '屬': '屬'
+        '塑绘': '塑繪', '行丧': '行喪', '词讼': '詞訟', '置产': '置產', '入殓': '入殮', '开渠': '開渠', 
+        '谢土': '謝土', '启钻': '啟鑽', '安机械': '安機械','造桥':'造橋',
+        '诸事不宜': '諸事不宜', '诸事无忌': '諸事無忌', '嫁娶': '嫁娶', '祭祀': '祭祀', '祈福': '祈福', '斋醮': '齋醮',
+        '動土': '動土', '移徙': '移徙', '入宅': '入宅', '修造': '修造', '安葬': '安葬', '立碑': '立碑', '修坟': '修墳',
+        '成服': '成服', '除服': '除服', '纳采': '納採', '订盟': '訂盟', '纳婿': '納婿', '安床': '安床', '开光': '開光',
+        '经络': '經絡', '解除': '解除', '竖柱': '豎柱', '上梁': '上樑', '盖屋': '蓋屋', '纳財': '納財', '开市': '開市',
+        '交易': '交易', '立券': '立券', '挂匾': '掛匾', '出行': '出行', '理发': '理髮', '安门': '安門', '修饰垣墙': '修飾垣牆',
+        '造畜稠': '造畜稠', '作灶': '作灶', '放水': '放水', '掘井': '掘井', '开池': '開池', '开厕': '開廁', '破土': '破土',
+        '启攒': '啟攢', '扫舍': '掃舍', '平治道涂': '平治道塗', '馀事勿取': '餘事勿取', '求嗣': '求嗣', '伐木': '伐木',
+        '畋猎': '畋獵', '捕捉': '捕捉', '结网': '結網', '取渔': '取漁', '教牛马': '教牛馬', '开生坟': '開生墳',
+        '惊蛰': '驚蟄', '小满': '小滿', '芒种': '芒種', '处暑': '處暑', '白露': '白露', '寒露': '寒露', '霜降': '霜降','开仓': '開倉','出货财': '出貨財','腊月': '臘月','纳财': '納財',
+        '龙': '龍', '马': '馬', '鸡': '雞', '猪': '豬', '属': '屬',
+        '冲': '沖', '煞': '煞', '东': '東', '西': '西', '南': '南', '北': '北', '正东': '正東', '正西': '正西', '正南': '正南', '正北': '正北',
+        '炉中火': '爐中火', '剑锋金': '劍鋒金', '山头火': '山頭火', '涧下水': '澗下水', '城头土': '城頭土', '白蜡金': '白蠟金', '杨柳木': '楊柳木', '泉中水': '泉中水', '屋上土': '屋上土', '霹雳火': '霹靂火', '松柏木': '松柏木', '长流水': '長流水', '沙中金': '沙中金', '山下火': '山下火', '平地木': '平地木', '壁上土': '壁上土', '金箔金': '金箔金', '佛灯火': '佛燈火', '天河水': '天河水', '驿马': '驛馬',
+        '春节': '春節', '元宵节': '元宵節', '端午节': '端午節', '七夕节': '七夕節', '中秋节': '中秋節', '重阳节': '重陽節', '除夕': '除夕'
     };
-
     function toTraditional(text) {
         if (!text) return "";
         if (Array.isArray(text)) return text.map(item => toTraditional(item));
         let newItem = String(text);
-        for (let key in s2t_map) { newItem = newItem.replace(new RegExp(key, 'g'), s2t_map[key]); }
+        for (let key in s2t_map) {
+            newItem = newItem.replace(new RegExp(key, 'g'), s2t_map[key]);
+        }
         return newItem;
     }
 
     let currentDate = new Date();
 
+    // 初始化年份選單 (1900-2100)
     function initPicker() {
         const yearSelect = document.getElementById('yearSelect');
         for (let y = 1900; y <= 2100; y++) {
             const opt = document.createElement('option');
-            opt.value = y; opt.innerText = y;
+            opt.value = y;
+            opt.innerText = y;
             yearSelect.appendChild(opt);
         }
     }
 
+    // 判斷是否為新的國定假日
+    function isNewHoliday(solar, lunar) {
+        const year = solar.getYear();
+        const month = solar.getMonth();
+        const day = solar.getDay();
+        const lunarMonth = lunar.getMonth();
+        const lunarDay = lunar.getDay();
+        const yearStr = year.toString();
+        
+        // 陽曆1月1日：元旦 (新年)
+        if (month === 1 && day === 1) return '元旦';
+        
+        // 陽曆2月28日：和平紀念日
+        if (month === 2 && day === 28) return '和平紀念日';
+        
+        // 農曆除夕 (春節前一天)
+        // 判斷是否為農曆臘月最後一天
+        if (lunarMonth === 12) {
+            const nextDay = solar.next(1);
+            const nextLunar = nextDay.getLunar();
+            if (nextLunar.getMonth() === 1 && nextLunar.getDay() === 1) {
+                return '除夕';
+            }
+        }
+        
+        // 春節 (農曆正月初一至初三)
+        if (lunarMonth === 1 && lunarDay >= 1 && lunarDay <= 3) {
+            if (lunarDay === 1) return '春節(初一)';
+            if (lunarDay === 2) return '春節(初二)';
+            if (lunarDay === 3) return '春節(初三)';
+        }
+        
+        // 陽曆4月4日(兒童節)
+        if (month === 4 && day === 4) return '兒童節';
+        
+        // 民族掃墓節 (清明節) - 使用lunar庫的清明節判斷
+        const jieQi = lunar.getJieQi();
+        if (jieQi === '清明') return '清明節';
+        
+        // 陽曆5月1日：勞動節
+        if (month === 5 && day === 1) return '勞動節';
+        
+        // 農曆五月五日：端午節
+        if (lunarMonth === 5 && lunarDay === 5) return '端午節';
+        
+        // 農曆八月十五日：中秋節
+        if (lunarMonth === 8 && lunarDay === 15) return '中秋節';
+        
+        // 陽曆9月28日：教師節
+        if (month === 9 && day === 28) return '教師節';
+        
+        // 陽曆10月10日：國慶日
+        if (month === 10 && day === 10) return '國慶日';
+        
+        // 陽曆10月25日：光復節 (自2025年起)
+        if (year >= 2025 && month === 10 && day === 25) return '光復節';
+        
+        // 陽曆12月25日：行憲紀念日 (自2025年起)
+        if (year >= 2025 && month === 12 && day === 25) return '行憲紀念日';
+        
+        return null;
+    }
+
+    // 當下拉選單改變時
     function onPickerChange() {
-        currentDate = new Date(document.getElementById('yearSelect').value, document.getElementById('monthSelect').value, 1);
+        const y = document.getElementById('yearSelect').value;
+        const m = document.getElementById('monthSelect').value;
+        currentDate = new Date(y, m, 1);
         renderCalendar();
     }
 
     function renderCalendar() {
         const year = currentDate.getFullYear();
         const month = currentDate.getMonth();
+        
+        // 同步選單數值
         document.getElementById('yearSelect').value = year;
         document.getElementById('monthSelect').value = month;
 
@@ -202,7 +239,7 @@
         container.innerHTML = '';
 
         for (let i = 0; i < firstDay; i++) {
-            container.innerHTML += `<div class="day-box border-transparent bg-gray-50"></div>`;
+            container.innerHTML += `<div class="day-box border-transparent bg-gray-50/50"></div>`;
         }
 
         for (let d = 1; d <= lastDate; d++) {
@@ -210,10 +247,10 @@
             const solar = Solar.fromDate(dateObj);
             const lunar = solar.getLunar();
             const weekDay = dateObj.getDay();
-            const holidayName = getTWOHoliday(solar, lunar);
             
-            // 假日判定：自定義節慶 OR 週六 OR 週日
-            const isHoliday = holidayName !== null || weekDay === 0 || weekDay === 6;
+            // 使用新的國定假日判斷函數，不再使用lunar.getFestivals()
+            const holiday = isNewHoliday(solar, lunar);
+            const isHoliday = holiday !== null || weekDay === 0 || weekDay === 6;
             const isToday = new Date().toDateString() === dateObj.toDateString();
 
             const dayHtml = `
@@ -239,23 +276,26 @@
         const date = new Date(y, m, d);
         const solar = Solar.fromDate(date);
         const lunar = solar.getLunar();
-        const holidayName = getTWOHoliday(solar, lunar);
         const yiList = toTraditional(lunar.getDayYi());
         const jiList = toTraditional(lunar.getDayJi());
+        
+        // 使用新的國定假日判斷函數
+        const holiday = isNewHoliday(solar, lunar);
+        const festivals = holiday ? [holiday] : [];
 
         document.getElementById('detailPanel').innerHTML = `
             <div class="relative z-10">
                 <div class="flex justify-between items-center mb-4">
                     <div class="text-xs tracking-tighter text-gray-400 uppercase font-bold">${y}年${m+1}月${d}日</div>
                     <button onclick="copyInfo('${y}/${m+1}/${d} 農曆${toTraditional(lunar.getMonthInChinese())}月${toTraditional(lunar.getDayInChinese())} 宜:${yiList.join(',')} 忌:${jiList.join(',')}')" 
-                            class="text-[10px] text-gray-400 border px-3 py-1 rounded-full active:bg-gray-100">複製資訊</button>
+                            class="text-[10px] text-gray-400 border px-3 py-1 rounded-full">複製資訊</button>
                 </div>
                 
-                ${holidayName ? `<div class="festival-tag">慶 · ${holidayName}</div>` : ''}
+                ${festivals.length > 0 ? `<div class="festival-tag rounded-lg">${festivals[0]}</div>` : ''}
                 
                 <div class="text-6xl font-light serif mb-4">${d}</div>
                 
-                <div class="space-y-1 border-b border-gray-100 pb-4 mb-6">
+                <div class="space-y-1 border-b border-gray-100 pb-4 mb-4">
                     <div class="text-2xl font-bold serif">農曆 ${toTraditional(lunar.getMonthInChinese())}月${toTraditional(lunar.getDayInChinese())}</div>
                     <div class="text-gray-500 text-xs font-medium">
                         ${toTraditional(lunar.getYearInGanZhi())}(${toTraditional(lunar.getYearShengXiao())})年 · 
@@ -279,7 +319,7 @@
                     </div>
                 </div>
 
-                <div class="mt-8 pt-4 border-t border-gray-100 text-[11px] text-gray-400 space-y-1 leading-relaxed">
+                <div class="mt-8 pt-4 border-t border-gray-100 text-[15px] text-blue-400 space-y-1 leading-relaxed">
                     <div>節氣：<span class="text-gray-600 font-medium">${toTraditional(lunar.getJieQi()) || '無'}</span></div>
                     <div>沖煞：<span class="text-gray-600 font-medium">${toTraditional(lunar.getDayChongDesc())}</span></div>
                     <div>五行：<span class="text-gray-600 font-medium">${toTraditional(lunar.getDayNaYin())}</span></div>
