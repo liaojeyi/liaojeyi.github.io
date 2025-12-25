@@ -3,24 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
-    <title>專業八字命盤分析</title>
+    <title>八字命盤</title>
     <script src="https://cdn.jsdelivr.net/npm/lunar-javascript/lunar.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         body { 
             font-family: -apple-system, sans-serif; 
             background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-            margin: 0; 
-            padding: 15px; 
+            margin: 18px 0; 
+            padding: 18px; 
             color: #333; 
             line-height: 1.6;
             min-height: 100vh;
+            font-size: 18px; /* 增加基礎字體大小 */
         }
         .card { 
             max-width: 500px; 
             margin: 0 auto; 
             background: #fff; 
-            border-radius: 16px; 
+            border-radius: 18px; 
             box-shadow: 0 10px 30px rgba(0,0,0,0.15); 
             overflow: hidden; 
         }
@@ -41,6 +42,7 @@
             margin-bottom: 8px; 
             font-weight: bold; 
             color: #555;
+            font-size: 17px; /* 增加標籤字體大小 */
         }
         input, select { 
             width: 100%; 
@@ -48,7 +50,7 @@
             margin-bottom: 22px; 
             border: 2px solid #e0e0e0; 
             border-radius: 10px; 
-            font-size: 16px; 
+            font-size: 18px; 
             box-sizing: border-box; 
             transition: border 0.3s;
         }
@@ -103,12 +105,12 @@
             box-shadow: 0 3px 5px rgba(0,0,0,0.05);
         }
         .bazi-t { 
-            font-size: 13px; 
+            font-size: 14px; /* 增加八字標題字體大小 */
             color: #888; 
             margin-bottom: 5px;
         }
         .bazi-v { 
-            font-size: 22px; 
+            font-size: 24px; /* 增加八字內容字體大小 */
             font-weight: bold; 
             color: #d63031; 
             text-shadow: 1px 1px 1px rgba(0,0,0,0.1);
@@ -119,7 +121,7 @@
             border-left: 5px solid #b33939; 
             padding: 18px; 
             margin-top: 25px; 
-            font-size: 15px; 
+            font-size: 18px; /* 增加描述框字體大小 */
             line-height: 1.7;
             border-radius: 0 10px 10px 0;
             transition: transform 0.3s;
@@ -145,7 +147,7 @@
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 12px;
-            margin: 18px 0;
+            margin: 0;
         }
         
         .fortune-category {
@@ -154,13 +156,14 @@
             border-radius: 8px;
             border: 1px solid #eee;
             box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            font-size: 18px; /* 增加運勢分類字體大小 */
         }
         
         h3 {
             color: #b33939;
             margin-top: 0;
             margin-bottom: 12px;
-            font-size: 19px;
+            font-size: 20px; /* 增加標題字體大小 */
             border-bottom: 2px solid #ffeaa7;
             padding-bottom: 6px;
         }
@@ -189,11 +192,12 @@
             text-align: center;
             padding: 25px;
             color: #666;
+            font-size: 18px; /* 增加載入文字大小 */
         }
         
         .year-tabs {
             display: flex;
-            margin-bottom: 15px;
+            margin-bottom: 18px;
             border-bottom: 2px solid #eee;
         }
         
@@ -209,6 +213,7 @@
             border-radius: 8px 8px 0 0;
             margin-right: 5px;
             color: #555;
+            font-size: 18px; /* 增加年份標籤字體大小 */
         }
         
         .year-tab.active {
@@ -245,7 +250,7 @@
         }
         
         .wuxing-chart-container {
-            margin: 15px 0;
+            margin: 18px 0;
             padding: 10px;
             background: white;
             border-radius: 8px;
@@ -256,7 +261,7 @@
             display: grid;
             grid-template-columns: repeat(5, 1fr);
             gap: 8px;
-            margin-top: 15px;
+            margin-top: 18px;
         }
         
         .wuxing-item {
@@ -266,6 +271,7 @@
             font-weight: bold;
             color: white;
             text-shadow: 1px 1px 1px rgba(0,0,0,0.2);
+            font-size: 18px; /* 增加五行項目字體大小 */
         }
         
         .metal { background: linear-gradient(to bottom, #95a5a6, #7f8c8d); }
@@ -278,40 +284,42 @@
             background: #fffde7;
             padding: 12px;
             border-radius: 8px;
-            margin-top: 15px;
+            margin-top: 18px;
             border: 1px solid #fdcb6e;
+            font-size: 18px; /* 增加喜用神框字體大小 */
         }
         
         .bone-weight-box {
             text-align: center;
-            padding: 15px;
+            padding: 18px;
             background: linear-gradient(135deg, #8e44ad, #9b59b6);
             color: white;
             border-radius: 10px;
-            margin: 15px 0;
+            margin: 18px 0;
             box-shadow: 0 4px 8px rgba(142, 68, 173, 0.3);
         }
         
         .bone-weight-value {
-            font-size: 36px;
+            font-size: 38px; /* 增加骨重數值字體大小 */
             font-weight: bold;
             margin: 10px 0;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
         }
         
         .bone-weight-title {
-            font-size: 18px;
+            font-size: 20px; /* 增加骨重標題字體大小 */
             margin-bottom: 5px;
         }
         
         .bone-song-box {
             background: #f5eef8;
-            padding: 15px;
+            padding: 18px;
             border-radius: 8px;
-            margin-top: 15px;
+            margin-top: 18px;
             border-left: 4px solid #8e44ad;
-            font-style: italic;
+            /* 移除 font-style: italic; 以取消斜體 */
             line-height: 1.8;
+            font-size: 18px; /* 增加稱骨歌字體大小 */
         }
         
         @media (max-width: 480px) {
@@ -322,10 +330,16 @@
                 padding: 10px 3px;
             }
             .bazi-v {
-                font-size: 20px;
+                font-size: 22px; /* 調整手機上的八字內容字體大小 */
             }
             .wuxing-stats {
                 grid-template-columns: repeat(3, 1fr);
+            }
+            body {
+                font-size: 18px; /* 手機上基礎字體稍小 */
+            }
+            .desc-box {
+                font-size: 18px; /* 手機上描述框字體大小 */
             }
         }
         
@@ -333,17 +347,28 @@
             background: #fffde7;
             border-left: 4px solid #fdcb6e;
             padding: 12px;
-            margin: 15px 0;
+            margin: 18px 0;
             border-radius: 0 8px 8px 0;
-            font-size: 14px;
+            font-size: 18px; /* 增加提示框字體大小 */
             color: #666;
+        }
+        
+        /* 增加內文段落文字大小 */
+        p {
+            font-size: 18px;
+            line-height: 1.7;
+        }
+        
+        /* 增加運勢內容文字大小 */
+        .fortune-category p {
+            font-size: 18px;
         }
     </style>
 </head>
 <body>
 
 <div class="card">
-    <div class="header">🔮 八字命盤分析系統</div>
+    <div class="header">八字命盤分析系統</div>
     <div class="p-20">
         <label>公曆出生日期</label>
         <input type="date" id="myDate" value="1995-01-01">
@@ -362,22 +387,22 @@
         <button onclick="run()">開始分析</button>
 
         <div id="result">
-            <div id="lunarInfo" style="text-align:center; color:#b33939; font-weight:bold; margin-bottom:15px; padding:12px; background:#fff9e6; border-radius:8px; border:1px solid #ffeaa7;"></div>
+            <div id="lunarInfo" style="text-align:center; color:#b33939; font-weight:bold; margin-bottom:18px; padding:12px; background:#fff9e6; border-radius:8px; border:1px solid #ffeaa7; font-size:17px;"></div>
             
             <div class="bazi-row" id="baziDisplay"></div>
 
             <div class="desc-box">
-                <b style="color:#b33939; font-size:18px;">【日元與性格分析】</b><br>
+                <b style="color:#b33939; font-size:19px;">【日元與性格分析】</b><br>
                 <div id="charText" class="loading">分析中...</div>
             </div>
 
             <div class="desc-box purple-border">
-                <b style="color:#8e44ad; font-size:18px;">【八字五行比例與喜用神】</b><br>
+                <b style="color:#8e44ad; font-size:19px;">【八字五行比例與喜用神】</b><br>
                 <div id="wuxingText" class="loading">分析中...</div>
             </div>
 
             <div class="desc-box orange-border">
-                <b style="color:#e67e22; font-size:18px;">【袁天罡稱骨算命】</b><br>
+                <b style="color:#e67e22; font-size:19px;">【袁天罡稱骨算命】</b><br>
                 <div id="boneWeightText" class="loading">計算中...</div>
             </div>
 
@@ -388,12 +413,12 @@
             
             <div class="desc-box blue-border">
                 <div id="year2025Content" class="year-content active">
-                    <b style="color:#2980b9; font-size:18px;">【2025 乙巳年運勢建議】</b><br>
+                    <b style="color:#2980b9; font-size:19px;">【2025 乙巳年運勢建議】</b><br>
                     <div id="yearText2025" class="loading">分析中...</div>
                 </div>
                 
                 <div id="year2026Content" class="year-content">
-                    <b style="color:#27ae60; font-size:18px;">【2026 丙午年運勢建議】</b><br>
+                    <b style="color:#27ae60; font-size:19px;">【2026 丙午年運勢建議】</b><br>
                     <div id="yearText2026" class="loading">分析中...</div>
                 </div>
             </div>
@@ -972,7 +997,7 @@
 
             // 取得日元 (日柱的第一個字)
             const dayGan = d_gz.substring(0, 1);
-            
+ 
             // 顯示日元分析
             const dayAnalysis = dayAnalysisMap[dayGan];
             if (dayAnalysis) {
