@@ -375,19 +375,20 @@
         
         <label>出生時辰</label>
         <select id="myHour">
-            <option value="0">00:00 (子時)</option><option value="1">01:00 (丑時)</option>
-            <option value="3">03:00 (寅時)</option><option value="5">05:00 (卯時)</option>
-            <option value="7">07:00 (辰時)</option><option value="9">09:00 (巳時)</option>
-            <option value="11">11:00 (午時)</option><option value="13">13:00 (未時)</option>
-            <option value="15">15:00 (申時)</option><option value="17">17:00 (酉時)</option>
-            <option value="19">19:00 (戌時)</option><option value="21">21:00 (亥時)</option>
-            <option value="23">23:00 (子時)</option>
+            <option value="0">00:00~00:59 (子時)</option><option value="1">01:00~02:59 (丑時)</option>
+            <option value="3">03:00~04:59 (寅時)</option><option value="5">05:00~06:59 (卯時)</option>
+            <option value="7">07:00~08:59 (辰時)</option><option value="9">09:00~10:59 (巳時)</option>
+            <option value="11">11:00~12:59 (午時)</option><option value="13">13:00~14:59 (未時)</option>
+            <option value="15">15:00~16:59 (申時)</option><option value="17">17:00~18:59 (酉時)</option>
+            <option value="19">19:00~20:59 (戌時)</option><option value="21">21:00~22:59 (亥時)</option>
+            <option value="23">23:00~23:59 (子時)</option>
         </select>
 
         <button onclick="run()">開始分析</button>
 
         <div id="result">
-            <div id="lunarInfo" style="text-align:center; color:#b33939; font-weight:bold; margin-bottom:18px; padding:14px; background:#fff9e6; border-radius:8px; border:1px solid #ffeaa7; font-size:18px;"></div>
+            <!-- 修改1: 農曆資訊改為靠左對齊 -->
+            <div id="lunarInfo" style="text-align:left; color:#b33939; font-weight:bold; margin-bottom:18px; padding:14px; background:#fff9e6; border-radius:8px; border:1px solid #ffeaa7; font-size:18px;"></div>
             
             <div class="bazi-row" id="baziDisplay"></div>
 
@@ -401,11 +402,7 @@
                 <div id="wuxingText" class="loading">分析中...</div>
             </div>
 
-            <div class="desc-box orange-border">
-                <b style="color:#e67e22; font-size:19px;">【袁天罡稱骨算命】</b><br>
-                <div id="boneWeightText" class="loading">計算中...</div>
-            </div>
-
+            <!-- 修改2: 將年運勢建議區塊移到稱骨算命上方 -->
             <div class="year-tabs">
                 <button class="year-tab blue active" onclick="switchYear('2025')">2025乙巳年</button>
                 <button class="year-tab green" onclick="switchYear('2026')">2026丙午年</button>
@@ -421,6 +418,12 @@
                     <b style="color:#27ae60; font-size:19px;">【2026 丙午年運勢建議】</b><br>
                     <div id="yearText2026" class="loading">分析中...</div>
                 </div>
+            </div>
+            
+            <!-- 修改2: 將稱骨算命區塊移動到年運勢建議下方 -->
+            <div class="desc-box orange-border">
+                <b style="color:#e67e22; font-size:19px;">【袁天罡稱骨算命】</b><br>
+                <div id="boneWeightText" class="loading">計算中...</div>
             </div>
             
             <div class="tip-box">
@@ -490,7 +493,7 @@
             relationshipAdvice: '需學習委婉表達，多考慮他人感受'
         },
         '辛': {
-            title: '辛金（陰金）— 珠寶之命',
+            title: '辛金（陰木）— 珠寶之命',
             characteristics: '心思細膩、追求完美、氣質優雅、重視外表',
             strengths: '審美觀強、注重細節、有才華、善於交際',
             weaknesses: '過於挑剔、愛面子、抗壓性低、容易悲觀',
@@ -1003,11 +1006,11 @@
             if (dayAnalysis) {
                 document.getElementById('charText').innerHTML = `
                     <h3>${dayAnalysis.title}</h3>
-                    <p><strong>基本性格：</strong>${dayAnalysis.characteristics}</p>
-                    <p><strong>優點：</strong>${dayAnalysis.strengths}</p>
-                    <p><strong>缺點：</strong>${dayAnalysis.weaknesses}</p>
-                    <p><strong>職業建議：</strong>${dayAnalysis.careerSuggestions}</p>
-                    <p><strong>人際建議：</strong>${dayAnalysis.relationshipAdvice}</p>
+                    <p align="left"><strong>基本性格：</strong>${dayAnalysis.characteristics}</p>
+                    <p align="left"><strong>優點：</strong>${dayAnalysis.strengths}</p>
+                    <p align="left"><strong>缺點：</strong>${dayAnalysis.weaknesses}</p>
+                    <p align="left"><strong>職業建議：</strong>${dayAnalysis.careerSuggestions}</p>
+                    <p align="left"><strong>人際建議：</strong>${dayAnalysis.relationshipAdvice}</p>
                 `;
             } else {
                 document.getElementById('charText').innerText = '日元分析資料暫缺';
@@ -1036,9 +1039,9 @@
                     <div class="wuxing-item earth">土: ${wuxingCount['土']} (${wuxingPercentages['土']}%)</div>
                 </div>
                 <div class="xishen-box">
-                    <p><strong>喜用神分析：</strong>${xishenAdvice}</p>
-                    <p><strong>日主五行：</strong>${wuxingMap[dayGan]} (${dayGan})</p>
-                    <p><strong>五行平衡建議：</strong>根據八字五行比例，建議在生活中多使用喜用神相關的元素、顏色和方位，以達到五行平衡，改善運勢。</p>
+                    <p align="left"><strong>喜用神分析：</strong>${xishenAdvice}</p>
+                    <p align="left"><strong>日主五行：</strong>${wuxingMap[dayGan]} (${dayGan})</p>
+                    <p align="left"><strong>五行平衡建議：</strong>根據八字五行比例，建議在生活中多使用喜用神相關的元素、顏色和方位，以達到五行平衡，改善運勢。</p>
                 </div>
             `;
 
@@ -1046,25 +1049,12 @@
             const boneWeight = calculateBoneWeight(lunar, hourVal);
             const boneSong = getBoneSong(boneWeight.totalWeight);
             
-            // 顯示稱骨算命結果
-            document.getElementById('boneWeightText').innerHTML = `
-                <div class="bone-weight-box">
-                    <div class="bone-weight-title">您的命骨總重</div>
-                    <div class="bone-weight-value">${boneWeight.totalWeight} 兩</div>
-                    <div>年骨重: ${boneWeight.yearWeight}兩 |月骨重: ${boneWeight.monthWeight}兩 <p></p>日骨重: ${boneWeight.dayWeight}兩 |時骨重: ${boneWeight.hourWeight}兩</div>
-                </div>
-                <div class="bone-song-box">
-                    <h3>稱骨歌</h3>
-                    <p>${boneSong}</p>
-                </div>
-            `;
-
             // 顯示2025年運勢
             const yearFortune2025 = yearlyFortune2025Map[dayGan];
             if (yearFortune2025) {
                 document.getElementById('yearText2025').innerHTML = `
                     <h3>2025乙巳年整體運勢</h3>
-                    <p><strong>總論：</strong>${yearFortune2025.overall}</p>
+                    <p align="left"><strong>總論：</strong>${yearFortune2025.overall}</p>
                     <div class="fortune-grid">
                         <div class="fortune-category">
                             <strong>事業運：</strong><br>${yearFortune2025.career}
@@ -1095,7 +1085,7 @@
             if (yearFortune2026) {
                 document.getElementById('yearText2026').innerHTML = `
                     <h3>2026丙午年整體運勢</h3>
-                    <p><strong>總論：</strong>${yearFortune2026.overall}</p>
+                    <p align="left"><strong>總論：</strong>${yearFortune2026.overall}</p>
                     <div class="fortune-grid">
                         <div class="fortune-category">
                             <strong>事業運：</strong><br>${yearFortune2026.career}
@@ -1120,6 +1110,19 @@
                     <p>${getSimpleYearFortune(dayGan, '2026')}</p>
                 `;
             }
+
+            // 顯示稱骨算命結果
+            document.getElementById('boneWeightText').innerHTML = `
+                <div class="bone-weight-box">
+                    <div class="bone-weight-title">您的命骨總重</div>
+                    <div class="bone-weight-value">${boneWeight.totalWeight} 兩</div>
+                    <div>年骨重: ${boneWeight.yearWeight}兩 |月骨重: ${boneWeight.monthWeight}兩 <p></p>日骨重: ${boneWeight.dayWeight}兩 |時骨重: ${boneWeight.hourWeight}兩</div>
+                </div>
+                <div class="bone-song-box">
+                    <h3>稱骨歌</h3>
+                    <p align="left">${boneSong}</p>
+                </div>
+            `;
 
             document.getElementById('result').style.display = 'block';
             
