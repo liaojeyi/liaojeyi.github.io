@@ -16,6 +16,10 @@
             line-height: 1.6;
             min-height: 100vh;
             font-size: 18px; /* 增加基礎字體大小 */
+            -webkit-user-select: none; /* 禁止文字選取 */
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
         }
         .card { 
             max-width: 500px; 
@@ -195,60 +199,6 @@
             font-size: 18px; /* 增加載入文字大小 */
         }
         
-        .year-tabs {
-            display: flex;
-            margin-bottom: 18px;
-            border-bottom: 2px solid #eee;
-        }
-        
-        .year-tab {
-            flex: 1;
-            padding: 12px;
-            text-align: center;
-            background: #f8f9fa;
-            border: none;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s;
-            border-radius: 8px 8px 0 0;
-            margin-right: 5px;
-            color: #555;
-            font-size: 18px; /* 增加年份標籤字體大小 */
-        }
-        
-        .year-tab.active {
-            background: #b33939;
-            color: white;
-        }
-        
-        .year-tab.blue {
-            background: #f0f7ff;
-            color: #2980b9;
-        }
-        
-        .year-tab.blue.active {
-            background: #2980b9;
-            color: white;
-        }
-        
-        .year-tab.green {
-            background: #f0fff4;
-            color: #27ae60;
-        }
-        
-        .year-tab.green.active {
-            background: #27ae60;
-            color: white;
-        }
-        
-        .year-content {
-            display: none;
-        }
-        
-        .year-content.active {
-            display: block;
-        }
-        
         .wuxing-chart-container {
             margin: 18px 0;
             padding: 10px;
@@ -317,7 +267,6 @@
             border-radius: 8px;
             margin-top: 18px;
             border-left: 4px solid #8e44ad;
-            /* 移除 font-style: italic; 以取消斜體 */
             line-height: 1.8;
             font-size: 18px; /* 增加稱骨歌字體大小 */
         }
@@ -365,11 +314,11 @@
         }
     </style>
 </head>
-<body>
+<body oncontextmenu="return false;" onselectstart="return false;" oncopy="return false;" oncut="return false;" ondragstart="return false;" onkeydown="disableDevTools(event)">
 
 <div class="card">
     <div class="header">八字命盤分析系統<br>
-		<b style="color:white ; font-size:15px;">
+		<b style="color:white ; font-size:14px;">
                 ☯ 本程式不會非法蒐集個人資料，請您安心使用。☯
 		</b>
     </div>
@@ -406,22 +355,10 @@
                 <div id="wuxingText" class="loading">分析中...</div>
             </div>
 
-            <!-- 修改2: 將年運勢建議區塊移到稱骨算命上方 -->
-            <div class="year-tabs">
-                <button class="year-tab blue active" onclick="switchYear('2025')">2025乙巳年</button>
-                <button class="year-tab green" onclick="switchYear('2026')">2026丙午年</button>
-            </div>
-            
+            <!-- 修改2: 刪除2025年標籤，只顯示2026年 -->
             <div class="desc-box blue-border">
-                <div id="year2025Content" class="year-content active">
-                    <b style="color:#2980b9; font-size:19px;">【2025 乙巳年運勢建議】</b><br>
-                    <div id="yearText2025" class="loading">分析中...</div>
-                </div>
-                
-                <div id="year2026Content" class="year-content">
-                    <b style="color:#27ae60; font-size:19px;">【2026 丙午年運勢建議】</b><br>
-                    <div id="yearText2026" class="loading">分析中...</div>
-                </div>
+                <b style="color:#27ae60; font-size:19px;">【2026 丙午年運勢建議】</b><br>
+                <div id="yearText2026" class="loading">分析中...</div>
             </div>
             
             <!-- 修改2: 將稱骨算命區塊移動到年運勢建議下方 -->
@@ -442,6 +379,61 @@
 </div>
 
 <script>
+    // 程式碼保護函數 - 禁止開發者工具
+    function disableDevTools(e) {
+        // 禁用F12、Ctrl+Shift+I、Ctrl+Shift+J、Ctrl+U等
+        if (e.keyCode == 123 || // F12
+            (e.ctrlKey && e.shiftKey && e.keyCode == 73) || // Ctrl+Shift+I
+            (e.ctrlKey && e.shiftKey && e.keyCode == 74) || // Ctrl+Shift+J
+            (e.ctrlKey && e.keyCode == 85) || // Ctrl+U
+            (e.ctrlKey && e.shiftKey && e.keyCode == 67) || // Ctrl+Shift+C
+            (e.metaKey && e.altKey && e.keyCode == 73) // Cmd+Opt+I (Mac)
+        ) {
+            e.preventDefault();
+            e.stopPropagation();
+            return false;
+        }
+    }
+    
+    // 禁止右鍵選單、文字選取、複製等
+    document.addEventListener('contextmenu', function(e) {
+        e.preventDefault();
+        return false;
+    });
+    
+    document.addEventListener('selectstart', function(e) {
+        e.preventDefault();
+        return false;
+    });
+    
+    document.addEventListener('copy', function(e) {
+        e.preventDefault();
+        return false;
+    });
+    
+    document.addEventListener('cut', function(e) {
+        e.preventDefault();
+        return false;
+    });
+    
+    document.addEventListener('dragstart', function(e) {
+        e.preventDefault();
+        return false;
+    });
+    
+    // 定期檢查開發者工具
+    setInterval(function() {
+        const threshold = 160; // 控制台打開時窗口高度變化閾值
+        const widthThreshold = 200; // 控制台打開時窗口寬度變化閾值
+        
+        if (window.outerWidth - window.innerWidth > widthThreshold ||
+            window.outerHeight - window.innerHeight > threshold) {
+            // 檢測到開發者工具可能已打開，嘗試關閉頁面或重定向
+            document.body.innerHTML = '<div style="text-align:center;padding:50px;font-size:24px;">禁止使用開發者工具</div>';
+            window.location.href = 'about:blank';
+        }
+    }, 1000);
+    
     // 日元分析資料
     const dayAnalysisMap = {
         '甲': {
@@ -526,102 +518,7 @@
         }
     };
     
-    // 2025乙巳年運勢資料
-    const yearlyFortune2025Map = {
-        '甲': {
-            overall: '2025乙巳年對甲木日主是劫財坐食神的流年，機遇與挑戰並存。乙木為劫財，代表人際關係活躍但也帶來競爭；巳火為食神，代表才華展現與創意發揮。',
-            career: '職場上競爭加劇，但同時有展現能力的機會。利於團隊合作，但需注意人際關係，避免因過度自信而與同事產生摩擦。下半年有晉升或轉職機會。',
-            wealth: '財運起伏較大，正財穩定但偏財需謹慎。避免合夥投資，易有財務糾紛。理財宜保守，可考慮長期穩健型投資。',
-            health: '注意肝膽問題和壓力管理，適度運動有助於釋放壓力。春季需特別注意呼吸道健康。',
-            relationship: '感情上易有競爭者出現，單身者需主動出擊，已婚者需加強溝通。人際交往中需注意言行，避免無意中得罪人。',
-            auspiciousDirections: '東南方、西北方',
-            auspiciousColors: '綠色、藍色',
-            importantMonths: '農曆三月、七月、十一月'
-        },
-        '乙': {
-            overall: '2025乙巳年對乙木日主是比肩坐傷官的流年，才華得以發揮但壓力增加。乙木為比肩，代表同儕競爭與合作；巳火為傷官，代表創造力與表達欲增強。',
-            career: '競爭壓力大，但能憑藉專業能力脫穎而出。適合進修學習，提升技能。注意職場口舌是非，謹言慎行。',
-            wealth: '正財收入穩定，有意外之財機會但來去匆匆。不宜進行高風險投資。可考慮與創意相關的副業。',
-            health: '注意神經系統和腸胃問題，保持規律作息。夏季需防中暑與熱相關疾病。',
-            relationship: '人際關係活躍，但易有口舌是非。感情上需多些包容與理解，單身者易在學習場合遇到對象。',
-            auspiciousDirections: '東方、東南方',
-            auspiciousColors: '綠色、紅色',
-            importantMonths: '農曆二月、六月、十月'
-        },
-        '丙': {
-            overall: '2025乙巳年對丙火日主是正印坐比肩的流年，貴人運強，學習成長佳期。乙木為正印，代表長輩貴人與學習機會；巳火為比肩，代表人際支援與合作機會。',
-            career: '有上司或長輩提攜，利於職位晉升。適合考取證照、進修深造。團隊合作順暢，可藉助他人之力達成目標。',
-            wealth: '財運平穩上升，正財收入增加。適合長期穩健型投資，避免投機。下半年有意外收入機會。',
-            health: '注意心血管健康和眼睛保養，避免過度勞累。秋季需注意呼吸系統問題。',
-            relationship: '人際關係和諧，家庭運佳。單身者易透過長輩介紹認識對象，已有伴侶者感情穩定發展。',
-            auspiciousDirections: '南方、東南方',
-            auspiciousColors: '紅色、紫色',
-            importantMonths: '農曆四月、八月、十二月'
-        },
-        '丁': {
-            overall: '2025乙巳年對丁火日主是偏印坐劫財的流年，學習成長與人際互動並存。乙木為偏印，代表靈感與特殊才能；巳火為劫財，代表人際互動與資源分享。',
-            career: '靈感豐富，適合從事創意或研究工作。但需注意職場人際關係，避免與同事發生資源爭奪。',
-            wealth: '正財穩定，偏財需謹慎。不宜進行高風險投資，理財以保守為宜。',
-            health: '注意神經系統和睡眠品質，避免用腦過度。夏季需注意心血管健康。',
-            relationship: '人際關係複雜，需謹慎處理。感情上需多溝通，避免誤會產生。',
-            auspiciousDirections: '南方、西南方',
-            auspiciousColors: '紅色、黃色'
-        },
-        '戊': {
-            overall: '2025乙巳年對戊土日主是正官坐偏印的流年，事業發展與學習機會並存。乙木為正官，代表事業發展與責任；巳火為偏印，代表學習與思考。',
-            career: '事業發展順利，有晉升機會。適合進修學習，提升專業能力。但需注意職場壓力，適時放鬆。',
-            wealth: '正財收入增加，偏財運普通。適合穩健型投資，避免投機。',
-            health: '注意腸胃問題和壓力管理，保持規律作息。春季需注意肝膽健康。',
-            relationship: '感情穩定發展，單身者易在工作中認識對象。已婚者家庭和諧。',
-            auspiciousDirections: '中央、西南方',
-            auspiciousColors: '黃色、紅色'
-        },
-        '己': {
-            overall: '2025乙巳年對己土日主是七殺坐正印的流年，挑戰與機會並存。乙木為七殺，代表挑戰與壓力；巳火為正印，代表貴人與學習。',
-            career: '職場挑戰多，但同時有貴人相助。適合進修學習，提升競爭力。需注意工作壓力，適時調整。',
-            wealth: '財運起伏較大，正財穩定但偏財需謹慎。不宜進行高風險投資。',
-            health: '注意腸胃問題和壓力管理，保持規律作息。夏季需注意心血管健康。',
-            relationship: '感情上需多溝通，避免誤會產生。單身者易在學習場合認識對象。',
-            auspiciousDirections: '中央、南方',
-            auspiciousColors: '黃色、紅色'
-        },
-        '庚': {
-            overall: '2025乙巳年對庚金日主是正財坐七殺的流年，財運與挑戰並存。乙木為正財，代表穩定收入；巳火為七殺，代表挑戰與壓力。',
-            career: '事業發展順利，有晉升機會。但需注意職場競爭，適時展現能力。',
-            wealth: '正財收入增加，偏財運普通。適合穩健型投資，避免高風險。',
-            health: '注意呼吸系統和皮膚問題，保持良好作息。秋季需注意肺部健康。',
-            relationship: '感情穩定發展，單身者易在工作中認識對象。已婚者家庭和諧。',
-            auspiciousDirections: '西方、西北方',
-            auspiciousColors: '白色、金色'
-        },
-        '辛': {
-            overall: '2025乙巳年對辛金日主是偏財坐正官的流年，財運與事業發展並存。乙木為偏財，代表意外收入；巳火為正官，代表事業發展。',
-            career: '事業發展順利，有晉升機會。適合拓展業務，增加收入來源。',
-            wealth: '偏財運佳，有意外收入機會。但需謹慎理財，避免過度消費。',
-            health: '注意呼吸系統和皮膚問題，保持良好作息。夏季需注意心血管健康。',
-            relationship: '感情穩定發展，單身者易在社交場合認識對象。已婚者家庭和諧。',
-            auspiciousDirections: '西方、西北方',
-            auspiciousColors: '白色、金色'
-        },
-        '壬': {
-            overall: '2025乙巳年對壬水日主是傷官坐偏財的流年，才華發揮與財運並存。乙木為傷官，代表才華展現；巳火為偏財，代表意外收入。',
-            career: '才華得以發揮，適合從事創意工作。但需注意職場口舌，謹言慎行。',
-            wealth: '偏財運佳，有意外收入機會。但需謹慎理財，避免過度消費。',
-            health: '注意泌尿系統和腎臟問題，多喝水保持良好作息。冬季需注意腎臟健康。',
-            relationship: '感情上需多溝通，避免誤會產生。單身者易在創意場合認識對象。',
-            auspiciousDirections: '北方、西方',
-            auspiciousColors: '黑色、藍色'
-        },
-        '癸': {
-            overall: '2025乙巳年對癸水日主是食神坐正財的流年，生活享受與財運並存。乙木為食神，代表生活享受；巳火為正財，代表穩定收入。',
-            career: '工作順利，適合穩定發展。但需注意職場競爭，適時展現能力。',
-            wealth: '正財收入增加，偏財運普通。適合穩健型投資，避免高風險。',
-            health: '注意泌尿系統和腎臟問題，多喝水保持良好作息。秋季需注意腎臟健康。',
-            relationship: '感情穩定發展，單身者易在社交場合認識對象。已婚者家庭和諧。',
-            auspiciousDirections: '北方、西方',
-            auspiciousColors: '黑色、藍色'
-        }
-    };
+    // 刪除2025乙巳年運勢資料
     
     // 2026丙午年運勢資料
     const yearlyFortune2026Map = {
@@ -859,27 +756,6 @@
         7.1: "此命生來大不同，公侯卿相在其中，一生自有逍遙福，富貴榮華極品隆。"
     };
     
-    // 切換年份顯示
-    function switchYear(year) {
-        // 更新標籤狀態
-        document.querySelectorAll('.year-tab').forEach(tab => {
-            tab.classList.remove('active');
-        });
-        
-        if (year === '2025') {
-            document.querySelector('.year-tab.blue').classList.add('active');
-        } else {
-            document.querySelector('.year-tab.green').classList.add('active');
-        }
-        
-        // 更新內容顯示
-        document.querySelectorAll('.year-content').forEach(content => {
-            content.classList.remove('active');
-        });
-        
-        document.getElementById(`year${year}Content`).classList.add('active');
-    }
-    
     // 計算八字五行比例
     function calculateWuxing(bazi) {
         const wuxingCount = {
@@ -1057,37 +933,6 @@
             const boneWeight = calculateBoneWeight(lunar, hourVal);
             const boneSong = getBoneSong(boneWeight.totalWeight);
             
-            // 顯示2025年運勢
-            const yearFortune2025 = yearlyFortune2025Map[dayGan];
-            if (yearFortune2025) {
-                document.getElementById('yearText2025').innerHTML = `
-                    <h3>2025乙巳年整體運勢</h3>
-                    <p align="left"><strong>總論：</strong>${yearFortune2025.overall}</p>
-                    <div class="fortune-grid">
-                        <div class="fortune-category">
-                            <strong>事業運：</strong><br>${yearFortune2025.career}
-                        </div>
-                        <div class="fortune-category">
-                            <strong>財富運：</strong><br>${yearFortune2025.wealth}
-                        </div>
-                        <div class="fortune-category">
-                            <strong>健康運：</strong><br>${yearFortune2025.health}
-                        </div>
-                        <div class="fortune-category">
-                            <strong>感情運：</strong><br>${yearFortune2025.relationship}
-                        </div>
-                    </div>
-                    <p><strong>吉利方位：</strong> ${yearFortune2025.auspiciousDirections}</p>
-                    <p><strong>幸運顏色：</strong> ${yearFortune2025.auspiciousColors}</p>
-                    ${yearFortune2025.importantMonths ? `<p><strong>重要月份：</strong> ${yearFortune2025.importantMonths}</p>` : ''}
-                `;
-            } else {
-                document.getElementById('yearText2025').innerHTML = `
-                    <h3>2025乙巳年整體運勢</h3>
-                    <p>${getSimpleYearFortune(dayGan, '2025')}</p>
-                `;
-            }
-            
             // 顯示2026年運勢
             const yearFortune2026 = yearlyFortune2026Map[dayGan];
             if (yearFortune2026) {
@@ -1145,19 +990,6 @@
     
     // 簡單年度運勢（備用）
     function getSimpleYearFortune(dayGan, year) {
-        const year2025Map = {
-            '甲': '2025年劫財流年，朋友交往多，需防財物耗散。',
-            '乙': '2025年比肩流年，競爭壓力大，適合團隊合作。',
-            '丙': '2025年印星流年，有貴人相助，利於學習與進修。',
-            '丁': '2025年偏印流年，靈感豐富，但要注意身心壓力。',
-            '戊': '2025年官殺流年，職場挑戰多，是磨練意志的時期。',
-            '己': '2025年正官流年，事業有提升機會，宜守規守法。',
-            '庚': '2025年財星流年，財運機會增加，利於開展業務。',
-            '辛': '2025年偏財流年，有意外收入機會，但投資需謹慎。',
-            '壬': '2025年傷官流年，才華能發揮，但要注意職場口舌。',
-            '癸': '2025年食神流年，生活享受多，心情愉快順遂。'
-        };
-        
         const year2026Map = {
             '甲': '2026年食神流年，才華得以發揮，但需注意健康。',
             '乙': '2026年傷官流年，創意豐富，但需注意職場口舌。',
@@ -1171,11 +1003,7 @@
             '癸': '2026年正財流年，財運穩定增長，適合穩健投資。'
         };
         
-        if (year === '2025') {
-            return year2025Map[dayGan] || '2025年運勢計算中...';
-        } else {
-            return year2026Map[dayGan] || '2026年運勢計算中...';
-        }
+        return year2026Map[dayGan] || '2026年運勢計算中...';
     }
 </script>
 
